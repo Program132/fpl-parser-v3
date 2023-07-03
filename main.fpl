@@ -1,9 +1,5 @@
-variable entier a -> 5
-envoyer [ "La variable 'a' a pour valeur : " a ]
-changer a -> 10
-envoyer [ "La variable 'a' a changer de valeur et c'est maintenant : " a ]
+saisir texte a
+envoyer ["Valeur recuperer: " a ]
 
-variable texte b -> "cc"
-envoyer b
-changer b -> "yo"
-envoyer b
+saisir entier age -> "Age: "
+envoyer ["Valeur recuperer (vide): " age ]
