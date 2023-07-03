@@ -11,6 +11,7 @@ namespace FPL::Definition::Variables {
     private:
         std::string name;
         std::string value;
+        bool global = false;
         Type type;
     public:
         Variable();
@@ -19,10 +20,12 @@ namespace FPL::Definition::Variables {
         void setName(std::string_view n);
         void setValue(std::string_view v);
         void setType(Type t);
+        void setGlobal(bool b);
 
         std::string getName() const;
         std::string getValue() const;
         Type getType() const;
+        bool isGlobal() const;
 
         friend std::ostream& operator<<(std::ostream& flux, Variable const& token);
     };

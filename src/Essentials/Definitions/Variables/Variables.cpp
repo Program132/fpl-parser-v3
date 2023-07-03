@@ -27,6 +27,10 @@ namespace FPL::Definition::Variables {
         this->type = t;
     }
 
+    void Variable::setGlobal(bool b) {
+        this->global = b;
+    }
+
     std::string Variable::getName() const {
         return this->name;
     }
@@ -37,6 +41,10 @@ namespace FPL::Definition::Variables {
 
     Type Variable::getType() const {
         return this->type;
+    }
+
+    bool Variable::isGlobal() const {
+        return this->global;
     }
 }
 
