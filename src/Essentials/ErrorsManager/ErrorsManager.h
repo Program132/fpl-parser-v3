@@ -10,3 +10,6 @@ void forgotEqualOperator(std::vector<Token>::iterator token);
 void differentTypes(std::vector<Token>::iterator token);
 void VARIABLE_Instruction_Exist(std::vector<Token>::iterator token);
 void CHANGER_Instruction_unknowVariable(std::vector<Token>::iterator token);
+void missingparameter(std::vector<Token>::iterator token);
+void invalidparameter(std::vector<Token>::iterator token);
+void unknowfile(std::vector<Token>::iterator token);
