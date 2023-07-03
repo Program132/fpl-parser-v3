@@ -9,3 +9,4 @@ void forgotType(std::vector<Token>::iterator token);
 void forgotEqualOperator(std::vector<Token>::iterator token);
 void differentTypes(std::vector<Token>::iterator token);
 void VARIABLE_Instruction_Exist(std::vector<Token>::iterator token);
+void CHANGER_Instruction_unknowVariable(std::vector<Token>::iterator token);
