@@ -18,7 +18,6 @@ namespace FPL::Essential::Parser {
 
     bool Parser::managerInstructions(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data &data) {
         auto instruction = ExpectIdentifiant(currentToken);
-
         if (instruction.has_value()) {
             if (instruction->content == "envoyer") {
                 ENVOYER_Instruction(tokenList, currentToken, data);
@@ -26,24 +25,35 @@ namespace FPL::Essential::Parser {
             } else if (instruction->content == "variable") {
                 VARIABLE_Instruction(tokenList, currentToken, data);
                 return true;
+            } else if (instruction->content == "changer") {
+                CHANGER_Instruction(tokenList, currentToken, data);
+                return true;
             }
         }
         return false;
     }
 
     void Parser::ENVOYER_Instruction(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data& data) {
-        auto contenu = ExpectValue(currentToken);
-        if (contenu.has_value()) {
-            std::cout << contenu->content << std::endl;
-        } else {
-            auto identifiant = ExpectIdentifiant(currentToken);
-            if (identifiant.has_value() && data.variableExist(identifiant->content)) {
-                auto var = data.getVariable(identifiant->content);
-                std::cout << var->getValue() << std::endl;
-            } else {
+        bool pass = false;
+
+        FPL::Instruction::Envoyer::getInformation(currentToken, data, pass);
+
+        if (!pass) {
+            bool pass2 = false;
+
+            if (ExpectOperator(currentToken,"[").has_value()) {
+                while (!ExpectOperator(currentToken, "]").has_value()) {
+                    FPL::Instruction::Envoyer::getInformation(currentToken, data);
+                }
+                pass2 = true;
+            }
+
+            if (!pass2) {
                 forgotValue(currentToken);
             }
         }
+
+        std::cout << std::endl;
     }
 
     void Parser::VARIABLE_Instruction(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data& data) {
@@ -78,5 +88,33 @@ namespace FPL::Essential::Parser {
         }
 
         data.pushVariable(var);
+    }
+
+    void Parser::CHANGER_Instruction(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data& data) {
+        auto var_name = ExpectIdentifiant(currentToken);
+        if (!var_name.has_value()) {
+            CHANGER_Instruction_unknowVariable(currentToken);
+        }
+
+        if (!ExpectEqualOperator(currentToken)) {
+            forgotEqualOperator(currentToken);
+        }
+
+        auto new_var_value = ExpectValue(currentToken);
+        if (!new_var_value.has_value()) {
+            forgotValue(currentToken);
+        }
+
+        if (!data.variableExist(var_name->content)) {
+            VARIABLE_Instruction_Exist(currentToken);
+        }
+
+        auto var = data.getVariable(var_name->content);
+
+        if (new_var_value->type != var->getType()) {
+            differentTypes(currentToken);
+        }
+
+        data.updateVariableValue(var.value(), new_var_value->content);
     }
 }
