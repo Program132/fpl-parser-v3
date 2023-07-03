@@ -1,5 +1,6 @@
-saisir texte a
-envoyer ["Valeur recuperer: " a ]
+fichier lire content "file_to.txt"
+envoyer content
 
-saisir entier age -> "Age: "
-envoyer ["Valeur recuperer (vide): " age ]
+fichier ecrire "file_to.txt" -> "Salut la compagnie ! "
+fichier lire c "file_to.txt"
+envoyer c
