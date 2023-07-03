@@ -1,0 +1,31 @@
+#include "Envoyer.h"
+
+namespace FPL::Instruction::Envoyer {
+    void getInformation(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data, bool &pass) {
+        auto contenu = ExpectValue(currentToken);
+        if (contenu.has_value()) {
+            std::cout << contenu->content;
+            pass = true;
+        } else {
+            auto identifiant = ExpectIdentifiant(currentToken);
+            if (identifiant.has_value() && data.variableExist(identifiant->content)) {
+                auto var = data.getVariable(identifiant->content);
+                std::cout << var->getValue();
+                pass = true;
+            }
+        }
+    }
+
+    void getInformation(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data) {
+        auto contenu = ExpectValue(currentToken);
+        if (contenu.has_value()) {
+            std::cout << contenu->content;
+        } else {
+            auto identifiant = ExpectIdentifiant(currentToken);
+            if (identifiant.has_value() && data.variableExist(identifiant->content)) {
+                auto var = data.getVariable(identifiant->content);
+                std::cout << var->getValue();
+            }
+        }
+    }
+}
