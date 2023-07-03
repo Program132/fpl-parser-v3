@@ -8,7 +8,7 @@ namespace FPL::Essential::Parser {
         auto currentToken = tokenList.begin();
 
         while (currentToken != tokenList.end()) {
-            if (!managerInstructions(tokenList, currentToken, main_data)) {
+            if (!managerInstructions(currentToken, main_data)) {
                 std::cerr << "Inconnu: " << currentToken->content << ", ligne " << currentToken->lineNumber << "." << std::endl;
                 ++currentToken;
                 continue;
@@ -16,24 +16,27 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    bool Parser::managerInstructions(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data &data) {
+    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data) {
         auto instruction = ExpectIdentifiant(currentToken);
         if (instruction.has_value()) {
             if (instruction->content == "envoyer") {
-                ENVOYER_Instruction(tokenList, currentToken, data);
+                ENVOYER_Instruction(currentToken, data);
                 return true;
             } else if (instruction->content == "variable") {
-                VARIABLE_Instruction(tokenList, currentToken, data);
+                VARIABLE_Instruction(currentToken, data);
                 return true;
             } else if (instruction->content == "changer") {
-                CHANGER_Instruction(tokenList, currentToken, data);
+                CHANGER_Instruction(currentToken, data);
+                return true;
+            } else if (instruction->content == "saisir") {
+                SAISIR_Instruction(currentToken, data);
                 return true;
             }
         }
         return false;
     }
 
-    void Parser::ENVOYER_Instruction(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data& data) {
+    void Parser::ENVOYER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {
         bool pass = false;
 
         FPL::Instruction::Envoyer::getInformation(currentToken, data, pass);
@@ -56,7 +59,7 @@ namespace FPL::Essential::Parser {
         std::cout << std::endl;
     }
 
-    void Parser::VARIABLE_Instruction(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data& data) {
+    void Parser::VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {
         auto var_type = ExpectType(currentToken);
         if (!var_type.has_value()) {
             forgotType(currentToken);
@@ -90,7 +93,7 @@ namespace FPL::Essential::Parser {
         data.pushVariable(var);
     }
 
-    void Parser::CHANGER_Instruction(std::vector<Token>& tokenList, std::vector<Token>::iterator& currentToken, Data::Data& data) {
+    void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name.has_value()) {
             CHANGER_Instruction_unknowVariable(currentToken);
@@ -116,5 +119,45 @@ namespace FPL::Essential::Parser {
         }
 
         data.updateVariableValue(var.value(), new_var_value->content);
+    }
+
+    void Parser::SAISIR_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {
+        auto var_type = ExpectType(currentToken);
+        if (!var_type.has_value()) {
+            forgotType(currentToken);
+        }
+
+        auto var_name = ExpectIdentifiant(currentToken);
+        if (!var_name.has_value()) {
+            forgotName(currentToken);
+        }
+
+        bool msg = false;
+
+        if (ExpectEqualOperator(currentToken)) {
+            msg = true;
+        }
+
+        auto message_to_output = ExpectValue(currentToken);
+        if (message_to_output.has_value() && msg) {
+            std::cout << message_to_output->content;
+        } else if (msg && !message_to_output.has_value()) {
+            forgotValue(currentToken);
+        }
+
+        if (data.variableExist(var_name->content)) {
+            VARIABLE_Instruction_Exist(currentToken);
+        }
+
+        std::string get_answer_user;
+        std::cin >> get_answer_user;
+        std::cout << std::endl;
+
+        Variable var;
+        var.setName(var_name->content);
+
+        FPL::Instruction::Saisir::giveValueAndType(var, var_type.value(), get_answer_user);
+
+        data.pushVariable(var);
     }
 }
