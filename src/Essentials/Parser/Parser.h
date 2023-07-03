@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <string_view>
+#include <fstream>
 
 #include "../Tokenizer/Tokenizer.h"
 #include "../Data/Data.h"
@@ -26,9 +27,10 @@ namespace FPL::Essential::Parser {
         static bool managerInstructions( std::vector<Token>::iterator& currentToken, Data::Data& data);
 
         // Basics:
-        static void ENVOYER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void SAISIR_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void ENVOYER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void VARIABLE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void CHANGER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void SAISIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void FICHIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
     };
 }

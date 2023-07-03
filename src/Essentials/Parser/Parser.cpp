@@ -1,3 +1,4 @@
+#include <fstream>
 #include "Parser.h"
 
 namespace FPL::Essential::Parser {
@@ -30,6 +31,9 @@ namespace FPL::Essential::Parser {
                 return true;
             } else if (instruction->content == "saisir") {
                 SAISIR_Instruction(currentToken, data);
+                return true;
+            } else if (instruction->content == "fichier") {
+                FICHIER_Instruction(currentToken, data);
                 return true;
             }
         }
@@ -159,5 +163,61 @@ namespace FPL::Essential::Parser {
         FPL::Instruction::Saisir::giveValueAndType(var, var_type.value(), get_answer_user);
 
         data.pushVariable(var);
+    }
+
+    void Parser::FICHIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+        auto instru = ExpectIdentifiant(currentToken);
+        if (!instru.has_value()) {
+            missingparameter(currentToken);
+        }
+
+        if (instru->content == "lire") {
+            auto var_name = ExpectIdentifiant(currentToken);
+            if (!var_name.has_value()) {
+                forgotName(currentToken);
+            }
+
+            if (data.variableExist(var_name->content)) {
+                VARIABLE_Instruction_Exist(currentToken);
+            }
+
+            auto file_name = ExpectValue(currentToken);
+            if (file_name->type != FPL::Definition::Types::Type::STRING) {
+                unknowfile(currentToken);
+            }
+
+            std::ifstream file {file_name->content};
+            if (!file) {
+                unknowfile(currentToken);
+            }
+
+            std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+
+            Variable var(var_name->content, content, FPL::Definition::Types::Type::STRING);
+            data.pushVariable(var);
+        } else if (instru->content == "ecrire") {
+            auto file_name = ExpectValue(currentToken);
+            if (file_name->type != FPL::Definition::Types::Type::STRING) {
+                unknowfile(currentToken);
+            }
+
+            std::ofstream file {file_name->content};
+            if (!file) {
+                unknowfile(currentToken);
+            }
+
+            if (!ExpectEqualOperator(currentToken)) {
+                forgotEqualOperator(currentToken);
+            }
+
+            auto contentToWrite = ExpectValue(currentToken);
+            if (!contentToWrite.has_value()) {
+                forgotValue(currentToken);
+            }
+
+            file << contentToWrite->content;
+        } else {
+            invalidparameter(currentToken);
+        }
     }
 }
