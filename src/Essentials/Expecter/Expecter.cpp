@@ -3,7 +3,7 @@
 std::optional<Token> ExpectIdentifiant(std::vector<Token>::iterator &current) {
     if (current->type == IDENTIFIANT) {
         auto returnt = current;
-        returnt->content.erase(remove_if(returnt->content.begin(), returnt->content.end(), isspace), returnt->content.end());
+        returnt->content.erase(std::remove_if(returnt->content.begin(), returnt->content.end(), isspace), returnt->content.end());
         current++;
         return *returnt;
     }
@@ -11,12 +11,11 @@ std::optional<Token> ExpectIdentifiant(std::vector<Token>::iterator &current) {
 }
 
 std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::string_view o) {
+    auto returnt = current;
     if (current->type == OPERATOR && o.empty()) {
-        auto returnt = current;
         current++;
         return *returnt;
     } else if (current->type == OPERATOR && !o.empty() && current->content == o) {
-        auto returnt = current;
         current++;
         return *returnt;
     }
@@ -24,27 +23,24 @@ std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::
 }
 
 std::optional<FPL::Definition::Values::Value> ExpectValue(std::vector<Token>::iterator &current) {
+    auto returnt = current;
     if (current->type == INT || current->type == DOUBLE || current->type == STRING) {
-        auto returnt = current;
-        //return *returnt;
-        if (returnt->type == INT) {
+        if (current->type == INT) {
             FPL::Definition::Values::Value v(FPL::Definition::Types::INT, returnt->content);
             current++;
             return v;
-        } else if (returnt->type == DOUBLE) {
+        } else if (current->type == DOUBLE) {
             FPL::Definition::Values::Value v(FPL::Definition::Types::DOUBLE, returnt->content);
             current++;
             return v;
-        } else if (returnt->type == STRING) {
+        } else if (current->type == STRING) {
             returnt->content.erase(std::remove(returnt->content.begin(), returnt->content.end(), '\"'), returnt->content.end());
             FPL::Definition::Values::Value v(FPL::Definition::Types::STRING, returnt->content);
             current++;
             return v;
         }
     } else if (current->type == IDENTIFIANT && current->content == "vrai" || current->type == IDENTIFIANT && current->content == "faux") {
-        auto returnt = current;
         current++;
-        //return *returnt;
         FPL::Definition::Values::Value v(FPL::Definition::Types::BOOL, returnt->content);
         return v;
     }

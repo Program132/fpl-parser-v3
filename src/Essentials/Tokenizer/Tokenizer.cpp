@@ -63,6 +63,8 @@ namespace FPL::Essential::Tokenizer {
                 case '+':
                 case '-':
                 case '>':
+                case '[':
+                case ']':
                 case '<':
                     if (currentToken.type != POSSIBLE_STRING) {
                         ConcludeToken(currentToken, tokenList);
