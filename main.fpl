@@ -1,2 +1,9 @@
-envoyer "cc"
-envoyer 56
+variable entier a -> 5
+envoyer [ "La variable 'a' a pour valeur : " a ]
+changer a -> 10
+envoyer [ "La variable 'a' a changer de valeur et c'est maintenant : " a ]
+
+variable texte b -> "cc"
+envoyer b
+changer b -> "yo"
+envoyer b
