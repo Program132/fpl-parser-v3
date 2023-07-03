@@ -21,5 +21,6 @@ namespace FPL::Essential::Data {
         bool variableExist(const std::string& name);
         bool variableExist(Variable v);
         void pushVariable(Variable var);
+        void updateVariableValue(Variable var, const std::string& v);
     };
 }

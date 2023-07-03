@@ -26,4 +26,11 @@ namespace FPL::Essential::Data {
     void Data::pushVariable(Variable var) {
         Variables[var.getName()] = var;
     }
+
+    void Data::updateVariableValue(Variable var, const std::string &v) {
+        var.setValue(v);
+        Variables[var.getName()] = var;
+    }
+
+
 }
