@@ -35,6 +35,12 @@ namespace FPL::Essential::Parser {
             } else if (instruction->content == "fichier") {
                 FICHIER_Instruction(currentToken, data);
                 return true;
+            } else if (instruction->content == "constante") {
+                CONSTANTE_Instruction(currentToken, data);
+                return true;
+            } else if (instruction->content == "globale") {
+                GLOBALE_Instruction(currentToken, data);
+                return true;
             }
         }
         return false;
@@ -64,39 +70,13 @@ namespace FPL::Essential::Parser {
     }
 
     void Parser::VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {
-        auto var_type = ExpectType(currentToken);
-        if (!var_type.has_value()) {
-            forgotType(currentToken);
-        }
-
-        auto var_name = ExpectIdentifiant(currentToken);
-        if (!var_name.has_value()) {
-            forgotName(currentToken);
-        }
-
-        if (!ExpectEqualOperator(currentToken)) {
-            forgotEqualOperator(currentToken);
-        }
-
-        auto var_value = ExpectValue(currentToken);
-        if (!var_value.has_value()) {
-            forgotValue(currentToken);
-        }
-
-        if (var_type.value() != var_value->type) {
-            differentTypes(currentToken);
-        }
-
-
-        Variable var(var_name->content, var_value->content, var_type.value());
+        Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data);
 
         if (data.variableExist(var)) {
             VARIABLE_Instruction_Exist(currentToken);
         }
 
         data.pushVariable(var);
-
-        std::cout << var << std::endl;
     }
 
     void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {
@@ -119,6 +99,10 @@ namespace FPL::Essential::Parser {
         }
 
         auto var = data.getVariable(var_name->content);
+
+        if (!var->isMutable()) {
+            variable_no_mutable(currentToken);
+        }
 
         if (new_var_value->type != var->getType()) {
             differentTypes(currentToken);
@@ -221,5 +205,63 @@ namespace FPL::Essential::Parser {
         } else {
             invalidparameter(currentToken);
         }
+    }
+
+    void Parser::CONSTANTE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+        auto possibleGlobal = ExpectIdentifiant(currentToken);
+        bool global = false;
+        if (possibleGlobal.has_value() && possibleGlobal->content == "globale") {
+            global = true;
+        } else if (possibleGlobal.has_value() && possibleGlobal->content != "globale"
+          && possibleGlobal->content != "entier"
+          && possibleGlobal->content != "decimal"
+          && possibleGlobal->content != "texte"
+          && possibleGlobal->content != "bool"
+          && possibleGlobal->content != "booleen") { /* On exclut les types de F.P.L */
+            invalidparameter(currentToken);
+        } else {
+            --currentToken; // Ca peut être un type donc on revient en arrière d'un token
+        }
+
+        Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data);
+
+        var.setMutable(false);
+        if (global) {
+            var.setGlobal(true);
+        }
+
+        if (data.variableExist(var)) {
+            VARIABLE_Instruction_Exist(currentToken);
+        }
+        data.pushVariable(var);
+    }
+
+    void Parser::GLOBALE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+        auto possibleConst = ExpectIdentifiant(currentToken);
+        bool cons = false;
+        if (possibleConst.has_value() && possibleConst->content == "constante") {
+            cons = true;
+        } else if (possibleConst.has_value() && possibleConst->content != "constante"
+                   && possibleConst->content != "entier"
+                   && possibleConst->content != "decimal"
+                   && possibleConst->content != "texte"
+                   && possibleConst->content != "bool"
+                   && possibleConst->content != "booleen") { /* On exclut les types de F.P.L */
+            invalidparameter(currentToken);
+        } else {
+            --currentToken; // Ca peut être un type donc on revient en arrière d'un token
+        }
+
+        Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data);
+
+        var.setGlobal(true);
+        if (cons) {
+            var.setMutable(false);
+        }
+
+        if (data.variableExist(var)) {
+            VARIABLE_Instruction_Exist(currentToken);
+        }
+        data.pushVariable(var);
     }
 }

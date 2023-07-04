@@ -14,6 +14,7 @@
 
 #include "../../Instructions/envoyer/Envoyer.h"
 #include "../../Instructions/saisir/Saisir.h"
+#include "../../Instructions/VariablesUtils/Variables.h"
 
 #include "../../Utils/stringTo.h"
 
@@ -32,5 +33,7 @@ namespace FPL::Essential::Parser {
         static void CHANGER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void SAISIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void FICHIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void CONSTANTE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void GLOBALE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
     };
 }
