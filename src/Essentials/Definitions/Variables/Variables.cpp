@@ -2,7 +2,7 @@
 
 namespace FPL::Definition::Variables {
     std::ostream &operator<<(std::ostream &flux, const Variable &var) {
-        flux << "(Variable:" << var.name << ", type: " << FPL::Definition::Types::Types_STR[var.type] << ", value: " << var.value << ")";
+        flux << "(Variable:" << var.name << ", type: " << FPL::Definition::Types::Types_STR[var.type] << ", value: " << var.value << ", global: " << var.global << ")";
         return flux;
     }
 
@@ -31,6 +31,10 @@ namespace FPL::Definition::Variables {
         this->global = b;
     }
 
+    void Variable::setMutable(bool b) {
+        this->mut = b;
+    }
+
     std::string Variable::getName() const {
         return this->name;
     }
@@ -45,6 +49,10 @@ namespace FPL::Definition::Variables {
 
     bool Variable::isGlobal() const {
         return this->global;
+    }
+
+    bool Variable::isMutable() const {
+        return this->mut;
     }
 }
 
