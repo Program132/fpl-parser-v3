@@ -12,7 +12,7 @@ namespace FPL::Definition::Variables {
         std::string name;
         std::string value;
         bool global = false;
-        bool mut = false;
+        bool mut = true;
         Type type;
     public:
         Variable();
