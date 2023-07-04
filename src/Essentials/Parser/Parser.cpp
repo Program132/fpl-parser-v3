@@ -95,6 +95,8 @@ namespace FPL::Essential::Parser {
         }
 
         data.pushVariable(var);
+
+        std::cout << var << std::endl;
     }
 
     void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data) {

@@ -1,6 +1,2 @@
-fichier lire content "file_to.txt"
-envoyer content
-
-fichier ecrire "file_to.txt" -> "Salut la compagnie ! "
-fichier lire c "file_to.txt"
-envoyer c
+variable entier a -> 5
+variable entier global b -> 10
