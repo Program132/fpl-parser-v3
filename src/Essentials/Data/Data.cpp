@@ -32,5 +32,10 @@ namespace FPL::Essential::Data {
         Variables[var.getName()] = var;
     }
 
-
+    void Data::deleteVariableFromMap(Variable keyToRemove) {
+        auto it = Variables.find(keyToRemove.getName());
+        if (it != Variables.end()) {
+            Variables.erase(it);
+        }
+    }
 }
