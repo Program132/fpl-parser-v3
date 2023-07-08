@@ -35,5 +35,6 @@ namespace FPL::Essential::Parser {
         static void FICHIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void CONSTANTE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void GLOBALE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void RETIRER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
     };
 }

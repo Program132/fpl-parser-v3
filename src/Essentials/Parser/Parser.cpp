@@ -41,6 +41,9 @@ namespace FPL::Essential::Parser {
             } else if (instruction->content == "globale") {
                 GLOBALE_Instruction(currentToken, data);
                 return true;
+            } else if (instruction->content == "retirer") {
+                RETIRER_Instruction(currentToken, data);
+                return true;
             }
         }
         return false;
@@ -263,5 +266,20 @@ namespace FPL::Essential::Parser {
             VARIABLE_Instruction_Exist(currentToken);
         }
         data.pushVariable(var);
+    }
+
+    void Parser::RETIRER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+        auto var_name = ExpectIdentifiant(currentToken);
+
+        if (!var_name.has_value()) {
+            forgotvariable(currentToken);
+        }
+
+        if (!data.variableExist(var_name->content)) {
+            VARIABLE_Instruction_Exist(currentToken);
+        }
+
+        Variable var = data.getVariable(var_name->content).value();
+        data.deleteVariableFromMap(var);
     }
 }
