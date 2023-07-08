@@ -1,13 +1,5 @@
-constante entier a -> 10
+variable entier a -> 5
 envoyer a
-constante globale entier c -> 1
-envoyer c
-
-globale texte ms -> "Bienvenue !"
-envoyer ms
-globale constante texte msg -> "BEYE NOOB"
-envoyer msg
-
-variable entier z -> 25
-variable entier x -> 15
-envoyer [ z ", " x ]
+retirer a
+envoyer ["valeur de a: " a ]
+envoyer 10
