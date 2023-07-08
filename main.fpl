@@ -1,0 +1,4 @@
+importer "lib.fpl"
+
+envoyer [ ", a:" a ]
+envoyer "cc"
