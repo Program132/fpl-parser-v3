@@ -17,6 +17,22 @@ namespace FPL::Essential::Parser {
         }
     }
 
+    Data::Data Parser::executeCode(std::vector<Token> tokenList) {
+        Data::Data data;
+
+        auto currentToken = tokenList.begin();
+
+        while (currentToken != tokenList.end()) {
+            if (!managerInstructions(currentToken, data)) {
+                std::cerr << "Inconnu: " << currentToken->content << ", ligne " << currentToken->lineNumber << "." << std::endl;
+                ++currentToken;
+                continue;
+            }
+        }
+
+        return data;
+    }
+
     bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data) {
         auto instruction = ExpectIdentifiant(currentToken);
         if (instruction.has_value()) {
@@ -43,6 +59,9 @@ namespace FPL::Essential::Parser {
                 return true;
             } else if (instruction->content == "retirer") {
                 RETIRER_Instruction(currentToken, data);
+                return true;
+            } else if (instruction->content == "importer") {
+                IMPORTER_Instruction(currentToken, data);
                 return true;
             }
         }
@@ -281,5 +300,28 @@ namespace FPL::Essential::Parser {
 
         Variable var = data.getVariable(var_name->content).value();
         data.deleteVariableFromMap(var);
+    }
+
+    void Parser::IMPORTER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+        auto path = ExpectValue(currentToken);
+
+        if (!path.has_value() || path->type != Definition::Types::STRING) {
+            IMPORT_pathstringormissing(currentToken);
+        }
+
+        std::ifstream fichier_fpl {path->content};
+        if (!fichier_fpl) {
+            IMPORT_pathstringormissing(currentToken);
+        }
+
+        std::string contentFile((std::istreambuf_iterator<char>(fichier_fpl)), (std::istreambuf_iterator<char>()));
+        auto const TokenList = TokenBuilder::CodeToTokens(contentFile);
+        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList);
+
+        for (auto const& var : next_data.Variables) {
+            if (var.second.isGlobal()) {
+                data.pushVariable(var.second);
+            }
+        }
     }
 }

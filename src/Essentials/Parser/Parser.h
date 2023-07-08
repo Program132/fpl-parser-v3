@@ -25,6 +25,7 @@ namespace FPL::Essential::Parser {
     class Parser {
     public:
         static void main(std::vector<Token> tokenList);
+        static Data::Data executeCode(std::vector<Token> tokenList);
         static bool managerInstructions( std::vector<Token>::iterator& currentToken, Data::Data& data);
 
         // Basics:
@@ -36,5 +37,6 @@ namespace FPL::Essential::Parser {
         static void CONSTANTE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void GLOBALE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void RETIRER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void IMPORTER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
     };
 }
