@@ -15,3 +15,4 @@ void invalidparameter(std::vector<Token>::iterator token);
 void unknowfile(std::vector<Token>::iterator token);
 void variable_no_mutable(std::vector<Token>::iterator token);
 void forgotvariable(std::vector<Token>::iterator token);
+void IMPORT_pathstringormissing(std::vector<Token>::iterator token);
