@@ -13,4 +13,5 @@ CREATE_ERROR(CHANGER_Instruction_unknowVariable, "Le nom de la variable precise 
 CREATE_ERROR(missingparameter, "Vous devez indiquer un parametre pour preciser l'action, ligne ", 7)
 CREATE_ERROR(invalidparameter, "Le parametre indiquer est invalide, ligne ", 8)
 CREATE_ERROR(unknowfile, "Le fichier indiquer n'est pas reconnu, mettez bien le nom du fichier entre '\"', ligne ", 9)
-CREATE_ERROR(variable_no_mutable, "La variable est constante ainsi elle ne peut changer de valeur, ligne ", 9)
+CREATE_ERROR(variable_no_mutable, "La variable est constante ainsi elle ne peut changer de valeur, ligne ", 10)
+CREATE_ERROR(forgotvariable, "Vous devez preciser une variable, ligne ", 11)
