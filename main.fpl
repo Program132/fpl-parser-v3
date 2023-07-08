@@ -1,6 +1,0 @@
-variable entier a -> 5
-constante entier b -> 10
-globale entier c -> 25
-globale constante entier d -> 50
-
-envoyer [ a "," b "," c "," d]
