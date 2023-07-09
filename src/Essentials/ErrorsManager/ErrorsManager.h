@@ -17,6 +17,7 @@ void variable_no_mutable(std::vector<Token>::iterator token);
 void forgotvariable(std::vector<Token>::iterator token);
 void IMPORT_pathstringormissing(std::vector<Token>::iterator token);
 void CONVERT_IntToBool(std::vector<Token>::iterator token);
+void CONVERT_BoolToInt(std::vector<Token>::iterator token);
 void CONVERT_StringToInt(std::vector<Token>::iterator token);
 void CONVERT_StringToDouble(std::vector<Token>::iterator token);
 void CONVERT_impossible(std::vector<Token>::iterator token);
