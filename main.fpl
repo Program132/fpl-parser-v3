@@ -1,14 +1,6 @@
-variable texte a -> "1"
-envoyer a
+variable bool a -> vrai
+variable bool b -> faux
+envoyer [ a "," b ]
 convertir a entier
-envoyer a
-
-variable texte b -> "0.5"
-envoyer b
-convertir b decimal
-envoyer b
-
-variable texte c -> "cc"
-envoyer c
-convertir c decimal
-envoyer c
+convertir b entier
+envoyer [ a "," b ]
