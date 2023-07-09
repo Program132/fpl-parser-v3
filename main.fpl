@@ -1,4 +1,14 @@
-importer "lib.fpl"
+variable texte a -> "1"
+envoyer a
+convertir a entier
+envoyer a
 
-envoyer [ ", a:" a ]
-envoyer "cc"
+variable texte b -> "0.5"
+envoyer b
+convertir b decimal
+envoyer b
+
+variable texte c -> "cc"
+envoyer c
+convertir c decimal
+envoyer c
