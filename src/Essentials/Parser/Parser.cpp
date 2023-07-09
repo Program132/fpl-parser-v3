@@ -359,6 +359,20 @@ namespace FPL::Essential::Parser {
             } else {
                 CONVERT_IntToBool(currentToken);
             }
+        } else if (var.getType() == Definition::Types::BOOL && new_type.value() == Definition::Types::INT) {
+            if (var.getValue() == "vrai") {
+                data.deleteVariableFromMap(var);
+                var.setType(Definition::Types::BOOL);
+                var.setValue("1");
+                data.pushVariable(var);
+            } else if (var.getValue() == "faux") {
+                data.deleteVariableFromMap(var);
+                var.setType(Definition::Types::BOOL);
+                var.setValue("0");
+                data.pushVariable(var);
+            } else {
+                CONVERT_BoolToInt(currentToken);
+            }
         } else if (var.getType() == Definition::Types::STRING && new_type.value() == Definition::Types::INT) {
             auto int_v = FPL::Utils::stringToInt(var.getValue());
             if (int_v.has_value()) {
