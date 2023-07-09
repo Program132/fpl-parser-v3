@@ -63,6 +63,9 @@ namespace FPL::Essential::Parser {
             } else if (instruction->content == "importer") {
                 IMPORTER_Instruction(currentToken, data);
                 return true;
+            } else if (instruction->content == "convertir") {
+                CONVERTIR_Instruction(currentToken, data);
+                return true;
             }
         }
         return false;
@@ -322,6 +325,56 @@ namespace FPL::Essential::Parser {
             if (var.second.isGlobal()) {
                 data.pushVariable(var.second);
             }
+        }
+    }
+
+    void Parser::CONVERTIR_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+        auto var_name = ExpectIdentifiant(currentToken);
+        if (!var_name.has_value()) {
+            forgotvariable(currentToken);
+        }
+
+        auto new_type = ExpectType(currentToken);
+        if (!new_type.has_value()) {
+            forgotType(currentToken);
+        }
+
+        if (!data.variableExist(var_name->content)) {
+            VARIABLE_Instruction_Exist(currentToken);
+        }
+
+        Variable var = data.getVariable(var_name->content).value();
+
+        if (var.getType() == Definition::Types::INT && new_type.value() == Definition::Types::BOOL) {
+            if (var.getValue() == "1") {
+                data.deleteVariableFromMap(var);
+                var.setType(Definition::Types::BOOL);
+                var.setValue("vrai");
+                data.pushVariable(var);
+            } else if (var.getValue() == "0") {
+                data.deleteVariableFromMap(var);
+                var.setType(Definition::Types::BOOL);
+                var.setValue("faux");
+                data.pushVariable(var);
+            } else {
+                CONVERT_IntToBool(currentToken);
+            }
+        } else if (var.getType() == Definition::Types::STRING && new_type.value() == Definition::Types::INT) {
+            auto int_v = FPL::Utils::stringToInt(var.getValue());
+            if (int_v.has_value()) {
+
+            } else {
+                CONVERT_StringToInt(currentToken);
+            }
+        } else if (var.getType() == Definition::Types::STRING && new_type.value() == Definition::Types::DOUBLE) {
+            auto d_v = FPL::Utils::stringToDouble(var.getValue());
+            if (d_v.has_value()) {
+
+            } else {
+                CONVERT_StringToDouble(currentToken);
+            }
+        } else {
+            CONVERT_impossible(currentToken);
         }
     }
 }

@@ -38,5 +38,6 @@ namespace FPL::Essential::Parser {
         static void GLOBALE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void RETIRER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void IMPORTER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
+        static void CONVERTIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
     };
 }
