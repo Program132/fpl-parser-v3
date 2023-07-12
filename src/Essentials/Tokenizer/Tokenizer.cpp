@@ -62,6 +62,7 @@ namespace FPL::Essential::Tokenizer {
                 case '/':
                 case '+':
                 case '-':
+                case '=':
                 case '>':
                 case '[':
                 case ']':
