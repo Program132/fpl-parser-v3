@@ -494,7 +494,7 @@ namespace FPL::Essential::Parser {
 
         auto conditionalOperator = ExpecterConditionalOperator(currentToken);
         if (!conditionalOperator.has_value()) {
-            std::cerr << "Erreur : opérateur conditionnel '>' manquant" << std::endl;
+            std::cerr << "Erreur : opérateur conditionnel manquant" << std::endl;
         }
 
         std::optional<FPL::Definition::Values::Value> valueToCompare = ExpectValue(currentToken);
@@ -542,6 +542,49 @@ namespace FPL::Essential::Parser {
             std::cerr << "Erreur : les accolades ne sont pas correctement fermées" << std::endl;
         }
 
-        executeCode(innerCodeTokens, data);
+        Variable var = data.getVariable(varName->content).value();
+        std::string currentValue = var.getValue();
+        std::string valueToCompareStr = valueToCompare->content;
+        bool conditionMet = false;
+
+        if (conditionalOperator.value() == ">") {
+            conditionMet = (currentValue > valueToCompareStr);
+        } else if (conditionalOperator.value() == "<") {
+            conditionMet = (currentValue < valueToCompareStr);
+        } else if (conditionalOperator.value() == ">=") {
+            conditionMet = (currentValue >= valueToCompareStr);
+        } else if (conditionalOperator.value() == "<=") {
+            conditionMet = (currentValue <= valueToCompareStr);
+        }
+
+        while (conditionMet) {
+            var = data.getVariable(varName->content).value();
+            currentValue = var.getValue();
+            valueToCompareStr = valueToCompare->content;
+
+            if (action->content == "diminuer") {
+                auto value = std::stoi(valueToAddOrRemove->content);
+                currentValue = std::to_string(std::stoi(currentValue) - value);
+            } else if (action->content == "augmenter") {
+                auto value = std::stoi(valueToAddOrRemove->content);
+                currentValue = std::to_string(std::stoi(currentValue) + value);
+            }
+
+            var.setValue(currentValue);
+            data.updateVariableValue(var, currentValue);
+
+            executeCode(innerCodeTokens, data);
+
+            if (conditionalOperator.value() == ">") {
+                conditionMet = (currentValue > valueToCompareStr);
+            } else if (conditionalOperator.value() == "<") {
+                conditionMet = (currentValue < valueToCompareStr);
+            } else if (conditionalOperator.value() == ">=") {
+                conditionMet = (currentValue >= valueToCompareStr);
+            } else if (conditionalOperator.value() == "<=") {
+                conditionMet = (currentValue <= valueToCompareStr);
+            }
+        }
     }
+
 }
