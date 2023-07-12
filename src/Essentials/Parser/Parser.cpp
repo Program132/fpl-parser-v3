@@ -5,7 +5,6 @@ namespace FPL::Essential::Parser {
 
     void Parser::main(std::vector<Token> tokenList) {
         Data::Data main_data;
-
         auto currentToken = tokenList.begin();
 
         while (currentToken != tokenList.end()) {
@@ -17,8 +16,14 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    Data::Data Parser::executeCode(std::vector<Token> tokenList) {
+    Data::Data Parser::executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data) {
         Data::Data data;
+
+        if (old_data.has_value()) {
+            for (auto const& v : old_data->Variables) {
+                data.pushVariable(v.second);
+            }
+        }
 
         auto currentToken = tokenList.begin();
 
@@ -68,6 +73,9 @@ namespace FPL::Essential::Parser {
                 return true;
             } else if (instruction->content == "verifier") {
                 VERIFIER_Instruction(currentToken, data);
+                return true;
+            } else if (instruction->content == "tantque") {
+                TANT_QUE_Instruction(currentToken, data);
                 return true;
             }
         }
@@ -322,7 +330,7 @@ namespace FPL::Essential::Parser {
 
         std::string contentFile((std::istreambuf_iterator<char>(fichier_fpl)), (std::istreambuf_iterator<char>()));
         auto const TokenList = TokenBuilder::CodeToTokens(contentFile);
-        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList);
+        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList, std::nullopt);
 
         for (auto const& var : next_data.Variables) {
             if (var.second.isGlobal()) {
@@ -453,7 +461,7 @@ namespace FPL::Essential::Parser {
 
                     if (var.getValue() == value_to_compare->content) {
                         auto const TokenList = TokenBuilder::CodeToTokens(FPL::Utils::StringVectorToString(caseBloc_verifier));
-                        auto new_data = executeCode(TokenList);
+                        auto new_data = executeCode(TokenList, data);
                         for (auto const& v : new_data.Variables) {
                             if (v.second.isGlobal()) {
                                 data.pushVariable(v.second);
@@ -474,7 +482,11 @@ namespace FPL::Essential::Parser {
             }
         }
         else {
-            openCode(currentToken);
+            forgotToOpenCode(currentToken);
         }
+    }
+
+    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+
     }
 }
