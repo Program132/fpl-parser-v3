@@ -12,5 +12,6 @@ tantque i > 0, diminuer 1 {
     }
 }
 
+envoyer i
 envoyer a
 envoyer z
