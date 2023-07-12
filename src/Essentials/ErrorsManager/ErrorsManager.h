@@ -27,3 +27,4 @@ void VERIFIER_CAS_openCode(std::vector<Token>::iterator token);
 void forgotConditionalOperator(std::vector<Token>::iterator token);
 void TANTQUE_Vir_forgot(std::vector<Token>::iterator token);
 void TANTQUE_wrong_action(std::vector<Token>::iterator token);
+void TANTQUE_wrong_conditionalOperator(std::vector<Token>::iterator token);

@@ -27,3 +27,4 @@ CREATE_ERROR(VERIFIER_CAS_openCode, "Vous devez ouvrir avec ':' pour ouvrir un n
 CREATE_ERROR(forgotConditionalOperator, "Vous devez ajouter un operateur conditionel ('>', '<', '=', '>=' ou '<='), ligne ", 21)
 CREATE_ERROR(TANTQUE_Vir_forgot, "Vous devez rajouter ',' pour continuer l'expression de la boucle, ligne ", 22)
 CREATE_ERROR(TANTQUE_wrong_action, "Vous devez preciser une action a effectuer sur votre variable precise avec 'augmenter' ou 'diminuer' puis indiquer la valeur que vous allez ajouter ou retirer, ligne ", 23)
+CREATE_ERROR(TANTQUE_wrong_conditionalOperator, "L'operateur n'est pas disponible avec l'instruction 'tantque', ligne ", 24)
