@@ -1,10 +1,4 @@
-variable entier i -> 3
-
-tantque i > 0, diminuer 1 {
-    variable entier a -> 5
-    verifier a {
-        cas 5:
-        envoyer "Yo !"
-        ,
-    }
+paquet Info {
+    variable texte name -> "user"
+    variable texte pwd -> "1234"
 }
