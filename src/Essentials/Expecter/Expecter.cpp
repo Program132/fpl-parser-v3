@@ -23,6 +23,25 @@ std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::
     return std::nullopt;
 }
 
+std::optional<std::string> ExpectConditional(std::vector<Token>::iterator &current) {
+    auto first_op = ExpectOperator(current);
+    if (first_op.has_value()) {
+        auto sec_op = ExpectOperator(current);
+        if (first_op->content == ">" && !sec_op.has_value()) {
+            return ">";
+        } else if (first_op->content == "<" && !sec_op.has_value()) {
+            return "<";
+        } else if (first_op->content == "=" && !sec_op.has_value()) {
+            return "=";
+        } if (first_op->content == ">" && sec_op.has_value() && sec_op->content == "=") {
+            return ">=";
+        } if (first_op->content == "<" && sec_op.has_value() && sec_op->content == "=") {
+            return "<=";
+        }
+    }
+    return std::nullopt;
+}
+
 std::optional<FPL::Definition::Values::Value> ExpectValue(std::vector<Token>::iterator &current) {
     auto returnt = current;
     if (current->type == INT || current->type == DOUBLE || current->type == STRING) {
