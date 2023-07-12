@@ -1,5 +1,6 @@
 #include <fstream>
 #include <unordered_map>
+#include <utility>
 #include "Parser.h"
 
 namespace FPL::Essential::Parser {
@@ -76,7 +77,7 @@ namespace FPL::Essential::Parser {
                 VERIFIER_Instruction(currentToken, data);
                 return true;
             } else if (instruction->content == "tantque") {
-                TANT_QUE_Instruction(currentToken, data, tokenList);
+                TANT_QUE_Instruction(currentToken, data, std::move(tokenList));
                 return true;
             }
         }
@@ -490,42 +491,35 @@ namespace FPL::Essential::Parser {
     void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList) {
         std::optional<Token> varName = ExpectIdentifiant(currentToken);
         if (!varName.has_value()) {
-            std::cerr << "Erreur : nom de variable manquant" << std::endl;
-            // Gérer l'erreur ici
+            forgotvariable(currentToken);
         }
 
         auto conditionalOperator = ExpecterConditionalOperator(currentToken);
         if (!conditionalOperator.has_value()) {
-            std::cerr << "Erreur : opérateur conditionnel manquant" << std::endl;
-            // Gérer l'erreur ici
+            forgotConditionalOperator(currentToken);
         }
 
         std::optional<FPL::Definition::Values::Value> valueToCompare = ExpectValue(currentToken);
         if (!valueToCompare.has_value()) {
-            std::cerr << "Erreur : valeur à comparer manquante" << std::endl;
-            // Gérer l'erreur ici
+            forgotValue(currentToken);
         }
 
         if (!ExpectOperator(currentToken, ",").has_value()) {
-            std::cerr << "Erreur : opérateur ',' manquant" << std::endl;
-            // Gérer l'erreur ici
+            TANTQUE_Vir_forgot(currentToken);
         }
 
         std::optional<Token> action = ExpectIdentifiant(currentToken);
         if (!action.has_value() || (action->content != "diminuer" && action->content != "augmenter")) {
-            std::cerr << "Erreur : action manquante ou invalide" << std::endl;
-            // Gérer l'erreur ici
+            TANTQUE_wrong_action(currentToken);
         }
 
         std::optional<FPL::Definition::Values::Value> valueToAddOrRemove = ExpectValue(currentToken);
         if (!valueToAddOrRemove.has_value()) {
-            std::cerr << "Erreur : valeur à ajouter ou retirer manquante" << std::endl;
-            // Gérer l'erreur ici
+            forgotValue(currentToken);
         }
 
         if (!ExpectOperator(currentToken, "{").has_value()) {
-            std::cerr << "Erreur : accolade ouvrante manquante" << std::endl;
-            // Gérer l'erreur ici
+            forgotToOpenCode(currentToken);
         }
 
         std::vector<Token> innerCodeTokens;
@@ -623,5 +617,4 @@ namespace FPL::Essential::Parser {
             }
         }
     }
-
 }
