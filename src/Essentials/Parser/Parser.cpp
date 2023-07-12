@@ -558,9 +558,7 @@ namespace FPL::Essential::Parser {
         }
 
         while (conditionMet) {
-            var = data.getVariable(varName->content).value();
-            currentValue = var.getValue();
-            valueToCompareStr = valueToCompare->content;
+            executeCode(innerCodeTokens, data);
 
             if (action->content == "diminuer") {
                 auto value = std::stoi(valueToAddOrRemove->content);
@@ -573,8 +571,6 @@ namespace FPL::Essential::Parser {
             var.setValue(currentValue);
             data.updateVariableValue(var, currentValue);
 
-            executeCode(innerCodeTokens, data);
-
             if (conditionalOperator.value() == ">") {
                 conditionMet = (currentValue > valueToCompareStr);
             } else if (conditionalOperator.value() == "<") {
@@ -586,5 +582,4 @@ namespace FPL::Essential::Parser {
             }
         }
     }
-
 }
