@@ -24,19 +24,17 @@ std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::
 }
 
 std::optional<std::string> ExpecterConditionalOperator(std::vector<Token>::iterator &current) {
-    auto first_op = ExpectOperator(current);
-    if (first_op.has_value()) {
-        auto sec_op = ExpectOperator(current, "=");
-        if (first_op->content == ">" && !sec_op.has_value()) {
-            return ">";
-        } else if (first_op->content == "<" && !sec_op.has_value()) {
-            return "<";
-        } else if (first_op->content == "=" && !sec_op.has_value()) {
-            return "=";
-        } if (first_op->content == ">" && sec_op.has_value() && sec_op->content == "=") {
+    if (ExpectOperator(current, ">").has_value()) {
+        if (ExpectOperator(current, "=").has_value()) {
             return ">=";
-        } if (first_op->content == "<" && sec_op.has_value() && sec_op->content == "=") {
+        } else {
+            return ">";
+        }
+    } else if (ExpectOperator(current, "<").has_value()) {
+        if (ExpectOperator(current, "=").has_value()) {
             return "<=";
+        } else {
+            return "<";
         }
     }
     return std::nullopt;
