@@ -1,5 +1,16 @@
-variable entier i -> 3
+variable entier i -> 2
+variable entier a -> 10
+variable entier z -> 3
 
 tantque i > 0, diminuer 1 {
+    tantque a > 0, diminuer 1 {
+        envoyer [ "a: " a ]
+    }
 
+    tantque z > 0, diminuer 1 {
+        envoyer [ "z: " z ]
+    }
+
+    variable entier x -> 5
+    envoyer x
 }
