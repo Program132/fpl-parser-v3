@@ -1,4 +1,5 @@
 #include <fstream>
+#include <unordered_map>
 #include "Parser.h"
 
 namespace FPL::Essential::Parser {
@@ -490,34 +491,41 @@ namespace FPL::Essential::Parser {
         std::optional<Token> varName = ExpectIdentifiant(currentToken);
         if (!varName.has_value()) {
             std::cerr << "Erreur : nom de variable manquant" << std::endl;
+            // Gérer l'erreur ici
         }
 
         auto conditionalOperator = ExpecterConditionalOperator(currentToken);
         if (!conditionalOperator.has_value()) {
             std::cerr << "Erreur : opérateur conditionnel manquant" << std::endl;
+            // Gérer l'erreur ici
         }
 
         std::optional<FPL::Definition::Values::Value> valueToCompare = ExpectValue(currentToken);
         if (!valueToCompare.has_value()) {
             std::cerr << "Erreur : valeur à comparer manquante" << std::endl;
+            // Gérer l'erreur ici
         }
 
         if (!ExpectOperator(currentToken, ",").has_value()) {
             std::cerr << "Erreur : opérateur ',' manquant" << std::endl;
+            // Gérer l'erreur ici
         }
 
         std::optional<Token> action = ExpectIdentifiant(currentToken);
         if (!action.has_value() || (action->content != "diminuer" && action->content != "augmenter")) {
             std::cerr << "Erreur : action manquante ou invalide" << std::endl;
+            // Gérer l'erreur ici
         }
 
         std::optional<FPL::Definition::Values::Value> valueToAddOrRemove = ExpectValue(currentToken);
         if (!valueToAddOrRemove.has_value()) {
             std::cerr << "Erreur : valeur à ajouter ou retirer manquante" << std::endl;
+            // Gérer l'erreur ici
         }
 
         if (!ExpectOperator(currentToken, "{").has_value()) {
             std::cerr << "Erreur : accolade ouvrante manquante" << std::endl;
+            // Gérer l'erreur ici
         }
 
         std::vector<Token> innerCodeTokens;
@@ -540,46 +548,80 @@ namespace FPL::Essential::Parser {
 
         if (nestedBrackets != 0) {
             std::cerr << "Erreur : les accolades ne sont pas correctement fermées" << std::endl;
+            // Gérer l'erreur ici
         }
 
-        Variable var = data.getVariable(varName->content).value();
-        std::string currentValue = var.getValue();
-        std::string valueToCompareStr = valueToCompare->content;
-        bool conditionMet = false;
+        std::vector<Variable> variablesToUpdate;
+        std::vector<std::string> variablesToUpdate_values;
 
-        if (conditionalOperator.value() == ">") {
-            conditionMet = (currentValue > valueToCompareStr);
-        } else if (conditionalOperator.value() == "<") {
-            conditionMet = (currentValue < valueToCompareStr);
-        } else if (conditionalOperator.value() == ">=") {
-            conditionMet = (currentValue >= valueToCompareStr);
-        } else if (conditionalOperator.value() == "<=") {
-            conditionMet = (currentValue <= valueToCompareStr);
-        }
+        if (varName.has_value()) {
+            std::optional<Variable> optionalVar = data.getVariable(varName->content);
+            if (optionalVar.has_value()) {
+                Variable var = optionalVar.value();
+                std::string currentValue = var.getValue();
+                std::string valueToCompareStr = valueToCompare->content;
+                bool conditionMet = false;
 
-        while (conditionMet) {
-            executeCode(innerCodeTokens, data);
+                if (conditionalOperator.value() == ">") {
+                    conditionMet = (currentValue > valueToCompareStr);
+                } else if (conditionalOperator.value() == "<") {
+                    conditionMet = (currentValue < valueToCompareStr);
+                } else if (conditionalOperator.value() == ">=") {
+                    conditionMet = (currentValue >= valueToCompareStr);
+                } else if (conditionalOperator.value() == "<=") {
+                    conditionMet = (currentValue <= valueToCompareStr);
+                }
 
-            if (action->content == "diminuer") {
-                auto value = std::stoi(valueToAddOrRemove->content);
-                currentValue = std::to_string(std::stoi(currentValue) - value);
-            } else if (action->content == "augmenter") {
-                auto value = std::stoi(valueToAddOrRemove->content);
-                currentValue = std::to_string(std::stoi(currentValue) + value);
-            }
+                while (conditionMet) {
+                    auto new_data = executeCode(innerCodeTokens, data);
 
-            var.setValue(currentValue);
-            data.updateVariableValue(var, currentValue);
+                    if (action->content == "diminuer") {
+                        auto value = std::stoi(valueToAddOrRemove->content);
+                        currentValue = std::to_string(std::stoi(currentValue) - value);
+                    } else if (action->content == "augmenter") {
+                        auto value = std::stoi(valueToAddOrRemove->content);
+                        currentValue = std::to_string(std::stoi(currentValue) + value);
+                    }
 
-            if (conditionalOperator.value() == ">") {
-                conditionMet = (currentValue > valueToCompareStr);
-            } else if (conditionalOperator.value() == "<") {
-                conditionMet = (currentValue < valueToCompareStr);
-            } else if (conditionalOperator.value() == ">=") {
-                conditionMet = (currentValue >= valueToCompareStr);
-            } else if (conditionalOperator.value() == "<=") {
-                conditionMet = (currentValue <= valueToCompareStr);
+                    var.setValue(currentValue);
+                    data.updateVariableValue(var, currentValue);
+
+                    if (conditionalOperator.value() == ">") {
+                        conditionMet = (currentValue > valueToCompareStr);
+                    } else if (conditionalOperator.value() == "<") {
+                        conditionMet = (currentValue < valueToCompareStr);
+                    } else if (conditionalOperator.value() == ">=") {
+                        conditionMet = (currentValue >= valueToCompareStr);
+                    } else if (conditionalOperator.value() == "<=") {
+                        conditionMet = (currentValue <= valueToCompareStr);
+                    }
+
+                    for (const auto& pos_var : new_data.Variables) {
+                        const std::string& _variableName = pos_var.first;
+                        const Variable& newVar = pos_var.second;
+
+                        if (newVar.isGlobal() && !data.variableExist(_variableName)) {
+                            data.pushVariable(newVar);
+                        }
+
+                        auto newValue = newVar.getValue();
+                        auto variable = data.getVariable(_variableName);
+
+                        if (variable.has_value()) {
+                            variablesToUpdate.push_back(variable.value());
+                            variablesToUpdate_values.push_back(newValue);
+                        }
+                    }
+                }
+
+                int i = 0;
+                for (auto const& e : variablesToUpdate) {
+                    auto value = variablesToUpdate_values[i];
+                    data.updateVariableValue(e, value);
+                    i++;
+                }
             }
         }
     }
+
 }
