@@ -8,7 +8,7 @@ namespace FPL::Essential::Parser {
         auto currentToken = tokenList.begin();
 
         while (currentToken != tokenList.end()) {
-            if (!managerInstructions(currentToken, main_data)) {
+            if (!managerInstructions(currentToken, main_data, tokenList)) {
                 std::cerr << "Inconnu: " << currentToken->content << ", ligne " << currentToken->lineNumber << "." << std::endl;
                 ++currentToken;
                 continue;
@@ -28,7 +28,7 @@ namespace FPL::Essential::Parser {
         auto currentToken = tokenList.begin();
 
         while (currentToken != tokenList.end()) {
-            if (!managerInstructions(currentToken, data)) {
+            if (!managerInstructions(currentToken, data, tokenList)) {
                 std::cerr << "Inconnu: " << currentToken->content << ", ligne " << currentToken->lineNumber << "." << std::endl;
                 ++currentToken;
                 continue;
@@ -38,7 +38,7 @@ namespace FPL::Essential::Parser {
         return data;
     }
 
-    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data) {
+    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data, std::vector<Token> tokenList) {
         auto instruction = ExpectIdentifiant(currentToken);
         if (instruction.has_value()) {
             if (instruction->content == "envoyer") {
@@ -75,7 +75,7 @@ namespace FPL::Essential::Parser {
                 VERIFIER_Instruction(currentToken, data);
                 return true;
             } else if (instruction->content == "tantque") {
-                TANT_QUE_Instruction(currentToken, data);
+                TANT_QUE_Instruction(currentToken, data, tokenList);
                 return true;
             }
         }
@@ -486,7 +486,62 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data) {
+    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList) {
+        std::optional<Token> varName = ExpectIdentifiant(currentToken);
+        if (!varName.has_value()) {
+            std::cerr << "Erreur : nom de variable manquant" << std::endl;
+        }
 
+        auto conditionalOperator = ExpecterConditionalOperator(currentToken);
+        if (!conditionalOperator.has_value()) {
+            std::cerr << "Erreur : opérateur conditionnel '>' manquant" << std::endl;
+        }
+
+        std::optional<FPL::Definition::Values::Value> valueToCompare = ExpectValue(currentToken);
+        if (!valueToCompare.has_value()) {
+            std::cerr << "Erreur : valeur à comparer manquante" << std::endl;
+        }
+
+        if (!ExpectOperator(currentToken, ",").has_value()) {
+            std::cerr << "Erreur : opérateur ',' manquant" << std::endl;
+        }
+
+        std::optional<Token> action = ExpectIdentifiant(currentToken);
+        if (!action.has_value() || (action->content != "diminuer" && action->content != "augmenter")) {
+            std::cerr << "Erreur : action manquante ou invalide" << std::endl;
+        }
+
+        std::optional<FPL::Definition::Values::Value> valueToAddOrRemove = ExpectValue(currentToken);
+        if (!valueToAddOrRemove.has_value()) {
+            std::cerr << "Erreur : valeur à ajouter ou retirer manquante" << std::endl;
+        }
+
+        if (!ExpectOperator(currentToken, "{").has_value()) {
+            std::cerr << "Erreur : accolade ouvrante manquante" << std::endl;
+        }
+
+        std::vector<Token> innerCodeTokens;
+
+        int nestedBrackets = 1;
+
+        while (currentToken != tokenList.end() && nestedBrackets > 0) {
+            if (currentToken->content == "{") {
+                nestedBrackets++;
+            } else if (currentToken->content == "}") {
+                nestedBrackets--;
+            }
+
+            if (nestedBrackets > 0) {
+                innerCodeTokens.push_back(*currentToken);
+            }
+
+            currentToken++;
+        }
+
+        if (nestedBrackets != 0) {
+            std::cerr << "Erreur : les accolades ne sont pas correctement fermées" << std::endl;
+        }
+
+        executeCode(innerCodeTokens, data);
     }
 }
