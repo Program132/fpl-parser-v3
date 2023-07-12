@@ -11,11 +11,12 @@ std::optional<Token> ExpectIdentifiant(std::vector<Token>::iterator &current) {
 }
 
 std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::string_view o) {
-    auto returnt = current;
     if (current->type == OPERATOR && o.empty()) {
+        auto returnt = current;
         current++;
         return *returnt;
     } else if (current->type == OPERATOR && !o.empty() && current->content == o) {
+        auto returnt = current;
         current++;
         return *returnt;
     }
