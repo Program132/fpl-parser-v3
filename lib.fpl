@@ -1,4 +1,0 @@
-envoyer "Generate LIB..."
-
-globale entier a -> 15
-envoyer a
