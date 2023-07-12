@@ -1,6 +1,25 @@
-variable bool a -> vrai
-variable bool b -> faux
-envoyer [ a "," b ]
-convertir a entier
-convertir b entier
-envoyer [ a "," b ]
+variable entier a -> 5
+
+verifier a {
+    cas 0:
+        envoyer "Salut"
+        ,
+    cas 5:
+        variable entier b -> 10
+
+        verifier b {
+            cas 10:
+            variable entier c -> 5
+
+                verifier c {
+                    cas 5:
+                        envoyer "Aure voir"
+                        ,
+                }
+            ,
+            cas 25:
+            envoyer "++"
+            ,
+        }
+    ,
+}
