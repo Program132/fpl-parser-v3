@@ -3,15 +3,21 @@ variable entier a -> 10
 variable entier z -> 3
 
 tantque i > 0, diminuer 1 {
-    tantque a > 0, diminuer 5 {
-        envoyer [ "a: " a ]
-    }
-
-    tantque z > 0, diminuer 1 {
-        envoyer [ "z: " z ]
-    }
+    tantque a >= 0, diminuer 5 {}
+    tantque z >= 0, diminuer 1 {}
 }
 
-envoyer i
+envoyer a
+envoyer z
+
+changer i -> 2
+changer a -> 10
+changer z -> 3
+
+tantque i > 0, diminuer 1 {
+    tantque a > 0, diminuer 5 {}
+    tantque z > 0, diminuer 1 {}
+}
+
 envoyer a
 envoyer z
