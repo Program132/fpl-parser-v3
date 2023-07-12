@@ -21,3 +21,6 @@ void CONVERT_BoolToInt(std::vector<Token>::iterator token);
 void CONVERT_StringToInt(std::vector<Token>::iterator token);
 void CONVERT_StringToDouble(std::vector<Token>::iterator token);
 void CONVERT_impossible(std::vector<Token>::iterator token);
+void openCode(std::vector<Token>::iterator token);
+void VERIFIER_CAS_title(std::vector<Token>::iterator token);
+void VERIFIER_CAS_openCode(std::vector<Token>::iterator token);

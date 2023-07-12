@@ -20,4 +20,7 @@ CREATE_ERROR(CONVERT_IntToBool, "Pour convertir une variable de type entier vers
 CREATE_ERROR(CONVERT_BoolToInt, "Pour convertir une variable de type booleen vers un entier il faut que ce soit un 'vrai' ou 'faux' pour '1' ou '0', ligne ", 14)
 CREATE_ERROR(CONVERT_StringToInt, "Votre variable de type texte ne peut pas devenir un entier car elle ne contient pas un entier en valeur, ligne ", 15)
 CREATE_ERROR(CONVERT_StringToDouble, "Votre variable de type texte ne peut pas devenir un nombre decimal car elle ne contient pas un nombre decimal en valeur, ligne ", 16)
-CREATE_ERROR(CONVERT_impossible, "Il est impossible de convertir votre variable en un autre type, ligne ", 16)
+CREATE_ERROR(CONVERT_impossible, "Il est impossible de convertir votre variable en un autre type, ligne ", 17)
+CREATE_ERROR(openCode, "Vous devez ouvrir les accolades pour ouvrir un nouveau bloc de code, ligne ", 18)
+CREATE_ERROR(VERIFIER_CAS_title, "Vous devez commencer avec le 'titre' 'cas' pour indiquer un nouvelle verification dans l'instruction 'verifier', ligne ", 19)
+CREATE_ERROR(VERIFIER_CAS_openCode, "Vous devez ouvrir avec ':' pour ouvrir un nouveau bloc de code dans l'instruction 'verifier', ligne ", 20)
