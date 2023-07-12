@@ -1,25 +1,5 @@
-variable entier a -> 5
+variable entier i -> 3
 
-verifier a {
-    cas 0:
-        envoyer "Salut"
-        ,
-    cas 5:
-        variable entier b -> 10
+tantque i > 0, diminuer 1 {
 
-        verifier b {
-            cas 10:
-            variable entier c -> 5
-
-                verifier c {
-                    cas 5:
-                        envoyer "Aure voir"
-                        ,
-                }
-            ,
-            cas 25:
-            envoyer "++"
-            ,
-        }
-    ,
 }
