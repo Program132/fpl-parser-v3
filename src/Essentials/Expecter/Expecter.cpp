@@ -23,10 +23,10 @@ std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::
     return std::nullopt;
 }
 
-std::optional<std::string> ExpectConditional(std::vector<Token>::iterator &current) {
+std::optional<std::string> ExpecterConditionalOperator(std::vector<Token>::iterator &current) {
     auto first_op = ExpectOperator(current);
     if (first_op.has_value()) {
-        auto sec_op = ExpectOperator(current);
+        auto sec_op = ExpectOperator(current, "=");
         if (first_op->content == ">" && !sec_op.has_value()) {
             return ">";
         } else if (first_op->content == "<" && !sec_op.has_value()) {

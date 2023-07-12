@@ -16,7 +16,7 @@ using namespace FPL::Essential::Tokenizer;
 
 std::optional<Token> ExpectIdentifiant(std::vector<Token>::iterator &current);
 std::optional<Token> ExpectOperator(std::vector<Token>::iterator &current, std::string_view o = "");
-std::optional<std::string> ExpectConditional(std::vector<Token>::iterator &current);
+std::optional<std::string> ExpecterConditionalOperator(std::vector<Token>::iterator &current);
 std::optional<FPL::Definition::Values::Value> ExpectValue(std::vector<Token>::iterator &current);
 std::optional<FPL::Definition::Types::Type> ExpectType(std::vector<Token>::iterator &current);
 bool ExpectEqualOperator(std::vector<Token>::iterator &current);
