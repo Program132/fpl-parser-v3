@@ -45,5 +45,6 @@ namespace FPL::Essential::Parser {
         static void CONVERTIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void VERIFIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
         static void TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList);
+        static void PAQUET_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList);
     };
 }

@@ -79,6 +79,9 @@ namespace FPL::Essential::Parser {
             } else if (instruction->content == "tantque") {
                 TANT_QUE_Instruction(currentToken, data, std::move(tokenList));
                 return true;
+            } else if (instruction->content == "paquet") {
+                PAQUET_Instruction(currentToken, data, tokenList);
+                return true;
             }
         }
         return false;
@@ -616,5 +619,36 @@ namespace FPL::Essential::Parser {
                 }
             }
         }
+    }
+
+    void Parser::PAQUET_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token> tokenList) {
+        auto paquetName = ExpectIdentifiant(currentToken);
+        if (!paquetName.has_value()) {
+            forgotName(currentToken);
+        }
+
+        if (!ExpectOperator(currentToken, "{").has_value()) {
+            forgotToOpenCode(currentToken);
+        }
+
+        std::vector<Token> innerCodeTokens;
+
+        int nestedBrackets = 1;
+
+        while (currentToken != tokenList.end() && nestedBrackets > 0) {
+            if (currentToken->content == "{") {
+                nestedBrackets++;
+            } else if (currentToken->content == "}") {
+                nestedBrackets--;
+            }
+
+            if (nestedBrackets > 0) {
+                innerCodeTokens.push_back(*currentToken);
+            }
+
+            currentToken++;
+        }
+
+
     }
 }
