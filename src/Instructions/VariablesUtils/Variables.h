@@ -12,4 +12,5 @@
 
 namespace FPL::Instruction::VariablesUtils {
     Variable defineVariable(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data);
+    Variable defineVariable_Paquet(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data, std::string paquetName);
 }
