@@ -2,3 +2,16 @@ paquet Info {
     variable texte name -> "user"
     variable texte pwd -> "1234"
 }
+
+paquet Info_cb {
+    paquet Info_mmh {
+        variable texte name -> "user2"
+        variable texte pwd -> "789"
+    }
+}
+
+envoyer Info.name
+envoyer Info.pwd
+
+envoyer Info_cb.Info_mmh.name
+envoyer Info_cb.Info_mmh.pwd
