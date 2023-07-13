@@ -29,22 +29,22 @@ namespace FPL::Essential::Parser {
     class Parser {
     public:
         static void main(std::vector<Token> tokenList);
-        static Data::Data executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data);
-        static bool managerInstructions( std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList);
+        static Data::Data executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data, std::optional<std::string> paquet);
+        static bool managerInstructions( std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet);
 
         // Basics:
-        static void ENVOYER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void VARIABLE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void CHANGER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void SAISIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void FICHIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void CONSTANTE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void GLOBALE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void RETIRER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void IMPORTER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void CONVERTIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void VERIFIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data);
-        static void TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList);
-        static void PAQUET_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList);
+        static void ENVOYER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void VARIABLE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void CHANGER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void SAISIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void FICHIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void CONSTANTE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void GLOBALE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void RETIRER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void IMPORTER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void CONVERTIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void VERIFIER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet);
+        static void TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet);
+        static void PAQUET_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet);
     };
 }
