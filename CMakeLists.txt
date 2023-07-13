@@ -30,4 +30,4 @@ add_executable(fpl_parser_v3
         src/Instructions/VariablesUtils/Variables.h
         src/Utils/VectorsTo.cpp
         src/Utils/VectorsTo.h
-        )
+        src/Essentials/Definitions/Fonctions/Fonctions.cpp src/Essentials/Definitions/Fonctions/Fonctions.h)
