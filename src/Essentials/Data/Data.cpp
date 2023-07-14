@@ -38,4 +38,43 @@ namespace FPL::Essential::Data {
             Variables.erase(it);
         }
     }
+
+    void Data::pushFonction(FPL::Definition::Fonctions::Fonction f) {
+        Fonctions[f.getName()] = f;
+    }
+
+    std::optional<FPL::Definition::Fonctions::Fonction> Data::getFonction(const std::string &name) {
+        if (isFonction(name)) {
+            return Fonctions[name];
+        }
+        return std::nullopt;
+    }
+
+    bool Data::isFonction(const std::string &name) {
+        if (Fonctions.contains(name)) {
+            return true;
+        }
+        return false;
+    }
+
+    std::optional<FPL::Definition::Fonctions::Argument>
+    Data::getFonctionArgument(const std::string &functionName, const std::string &argName) {
+        if (isFonctionArgument(functionName, argName)) {
+            auto f = this->getFonction(functionName);
+            if (f->getArguments().contains(argName)) {
+                return f->getArgument(argName);
+            }
+        }
+        return std::nullopt;
+    }
+
+    bool Data::isFonctionArgument(const std::string &functionName, const std::string &argName) {
+        if (isFonction(functionName)) {
+            auto f = this->getFonction(functionName);
+            if (f->getArguments().contains(argName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
