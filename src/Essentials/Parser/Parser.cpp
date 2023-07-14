@@ -10,7 +10,7 @@ namespace FPL::Essential::Parser {
         auto currentToken = tokenList.begin();
 
         while (currentToken != tokenList.end()) {
-            if (!managerInstructions(currentToken, main_data, tokenList, std::nullopt)) {
+            if (!managerInstructions(currentToken, main_data, tokenList, std::nullopt, std::nullopt)) {
                 std::cerr << "Inconnu: " << currentToken->content << ", ligne " << currentToken->lineNumber << "." << std::endl;
                 ++currentToken;
                 continue;
@@ -18,7 +18,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    Data::Data Parser::executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data, std::optional<std::string> paquet) {
+    Data::Data Parser::executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         Data::Data data;
 
         if (old_data.has_value()) {
@@ -30,7 +30,7 @@ namespace FPL::Essential::Parser {
         auto currentToken = tokenList.begin();
 
         while (currentToken != tokenList.end()) {
-            if (!managerInstructions(currentToken, data, tokenList, paquet)) {
+            if (!managerInstructions(currentToken, data, tokenList, paquet, fonction)) {
                 std::cerr << "Inconnu: " << currentToken->content << ", ligne " << currentToken->lineNumber << "." << std::endl;
                 ++currentToken;
                 continue;
@@ -40,64 +40,70 @@ namespace FPL::Essential::Parser {
         return data;
     }
 
-    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data, std::vector<Token> tokenList, std::optional<std::string> paquet) {
+    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto instruction = ExpectIdentifiant(currentToken);
         if (instruction.has_value()) {
             if (instruction->content == "envoyer") {
-                ENVOYER_Instruction(currentToken, data, paquet);
+                ENVOYER_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "variable") {
-                VARIABLE_Instruction(currentToken, data, paquet);
+                VARIABLE_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "changer") {
-                CHANGER_Instruction(currentToken, data, paquet);
+                CHANGER_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "saisir") {
-                SAISIR_Instruction(currentToken, data, paquet);
+                SAISIR_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "fichier") {
-                FICHIER_Instruction(currentToken, data, paquet);
+                FICHIER_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "constante") {
-                CONSTANTE_Instruction(currentToken, data, paquet);
+                CONSTANTE_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "globale") {
-                GLOBALE_Instruction(currentToken, data, paquet);
+                GLOBALE_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "retirer") {
-                RETIRER_Instruction(currentToken, data, paquet);
+                RETIRER_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "importer") {
-                IMPORTER_Instruction(currentToken, data, paquet);
+                IMPORTER_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "convertir") {
-                CONVERTIR_Instruction(currentToken, data, paquet);
+                CONVERTIR_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "verifier") {
-                VERIFIER_Instruction(currentToken, data, paquet);
+                VERIFIER_Instruction(currentToken, data, paquet, fonction);
                 return true;
             } else if (instruction->content == "tantque") {
-                TANT_QUE_Instruction(currentToken, data, std::move(tokenList), paquet);
+                TANT_QUE_Instruction(currentToken, data, std::move(tokenList), paquet, fonction);
                 return true;
             } else if (instruction->content == "paquet") {
-                PAQUET_Instruction(currentToken, data, tokenList, paquet);
+                PAQUET_Instruction(currentToken, data, tokenList, paquet, fonction);
+                return true;
+            } else if (instruction->content == "definir") {
+                DEFINIR_Instruction(currentToken, data, tokenList, paquet, fonction);
+                return true;
+            } else if (instruction->content == "appeler") {
+                APPELER_Instruction(currentToken, data, tokenList, paquet, fonction);
                 return true;
             }
         }
         return false;
     }
 
-    void Parser::ENVOYER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet) {
+    void Parser::ENVOYER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         bool pass = false;
 
-        FPL::Instruction::Envoyer::getInformation(currentToken, data, pass);
+        FPL::Instruction::Envoyer::getInformation(currentToken, data, pass, fonction);
 
         if (!pass) {
             bool pass2 = false;
 
             if (ExpectOperator(currentToken,"[").has_value()) {
                 while (!ExpectOperator(currentToken, "]").has_value()) {
-                    FPL::Instruction::Envoyer::getInformation(currentToken, data);
+                    FPL::Instruction::Envoyer::getInformation(currentToken, data, fonction);
                 }
                 pass2 = true;
             }
@@ -110,9 +116,9 @@ namespace FPL::Essential::Parser {
         std::cout << std::endl;
     }
 
-    void Parser::VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet) {
+    void Parser::VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         if (paquet.has_value()) {
-            Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value());
+            Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value(), fonction);
 
             if (data.variableExist(var)) {
                 VARIABLE_Instruction_Exist(currentToken);
@@ -120,7 +126,7 @@ namespace FPL::Essential::Parser {
 
             data.pushVariable(var);
         } else {
-            Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data);
+            Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data, fonction);
 
             if (data.variableExist(var)) {
                 VARIABLE_Instruction_Exist(currentToken);
@@ -130,7 +136,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet) {
+    void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name.has_value()) {
             CHANGER_Instruction_unknowVariable(currentToken);
@@ -162,7 +168,7 @@ namespace FPL::Essential::Parser {
         data.updateVariableValue(var.value(), new_var_value->content);
     }
 
-    void Parser::SAISIR_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet) {
+    void Parser::SAISIR_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_type = ExpectType(currentToken);
         if (!var_type.has_value()) {
             forgotType(currentToken);
@@ -189,7 +195,16 @@ namespace FPL::Essential::Parser {
         if (message_to_output.has_value() && msg) {
             std::cout << message_to_output->content;
         } else if (msg && !message_to_output.has_value()) {
-            forgotValue(currentToken);
+            auto possibleID = ExpectIdentifiant(currentToken);
+            if (!possibleID.has_value()) {
+                forgotValue(currentToken);
+            }
+
+            if (fonction.has_value() && fonction->isArgument(possibleID->content)) {
+                std::cout << fonction->getArgument(possibleID->content)->getValue().content;
+            } else if (data.variableExist(possibleID->content)) {
+                std::cout << data.getVariable(possibleID->content)->getValue();
+            }
         }
 
         if (data.variableExist(var_name->content)) {
@@ -208,7 +223,7 @@ namespace FPL::Essential::Parser {
         data.pushVariable(var);
     }
 
-    void Parser::FICHIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::FICHIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto instru = ExpectIdentifiant(currentToken);
         if (!instru.has_value()) {
             missingparameter(currentToken);
@@ -264,7 +279,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::CONSTANTE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::CONSTANTE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto possibleGlobal = ExpectIdentifiant(currentToken);
         bool global = false;
         if (possibleGlobal.has_value() && possibleGlobal->content == "globale") {
@@ -281,7 +296,7 @@ namespace FPL::Essential::Parser {
         }
 
         if (paquet.has_value()) {
-            Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value());
+            Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value(), fonction);
 
             var.setMutable(false);
             if (global) {
@@ -293,7 +308,7 @@ namespace FPL::Essential::Parser {
             }
             data.pushVariable(var);
         } else {
-            Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data);
+            Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data, fonction);
 
             var.setMutable(false);
             if (global) {
@@ -307,7 +322,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::GLOBALE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::GLOBALE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto possibleConst = ExpectIdentifiant(currentToken);
         bool cons = false;
         if (possibleConst.has_value() && possibleConst->content == "constante") {
@@ -324,7 +339,7 @@ namespace FPL::Essential::Parser {
         }
 
         if (paquet.has_value()) {
-            Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value());
+            Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value(), fonction);
 
             var.setGlobal(true);
             if (cons) {
@@ -336,7 +351,7 @@ namespace FPL::Essential::Parser {
             }
             data.pushVariable(var);
         } else {
-            Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data);
+            Variable var = FPL::Instruction::VariablesUtils::defineVariable(currentToken, data, fonction);
 
             var.setGlobal(true);
             if (cons) {
@@ -350,7 +365,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::RETIRER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::RETIRER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
 
         if (!var_name.has_value()) {
@@ -365,7 +380,7 @@ namespace FPL::Essential::Parser {
         data.deleteVariableFromMap(var);
     }
 
-    void Parser::IMPORTER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::IMPORTER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto path = ExpectValue(currentToken);
 
         if (!path.has_value() || path->type != Definition::Types::STRING) {
@@ -379,7 +394,7 @@ namespace FPL::Essential::Parser {
 
         std::string contentFile((std::istreambuf_iterator<char>(fichier_fpl)), (std::istreambuf_iterator<char>()));
         auto const TokenList = TokenBuilder::CodeToTokens(contentFile);
-        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList, std::nullopt, paquet);
+        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList, std::nullopt, paquet, fonction);
 
         for (auto const& var : next_data.Variables) {
             if (var.second.isGlobal()) {
@@ -388,7 +403,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::CONVERTIR_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::CONVERTIR_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name.has_value()) {
             forgotvariable(currentToken);
@@ -452,101 +467,33 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::VERIFIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet) {
+    void Parser::VERIFIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name) {
             forgotvariable(currentToken);
         }
 
-        if (!data.variableExist(var_name->content)) {
+        if (!data.variableExist(var_name->content) && !fonction.has_value()) {
             forgotvariable(currentToken);
-        }
-
-        Variable var = data.getVariable(var_name->content).value();
-
-        if (ExpectOperator(currentToken, "{").has_value()) {
-
-            int totalInstructionBeforeEnd = 0;
-            int totalCasInVerifier = 0;
-
-            while (true) {
-                auto cas_title = ExpectIdentifiant(currentToken);
-                if (cas_title.has_value() && cas_title->content == "cas") {
-                    std::vector<std::string> caseBloc_verifier;
-
-                    auto value_to_compare = ExpectValue(currentToken);
-                    if (!value_to_compare.has_value()) {
-                        forgotValue(currentToken);
-                    }
-
-                    if (var.getType() != value_to_compare->type) {
-                        differentTypes(currentToken);
-                    }
-
-                    if (!ExpectOperator(currentToken, ":").has_value()) {
-                        VERIFIER_CAS_openCode(currentToken);
-                    }
-
-                    while (true) {
-                        if (currentToken->content == "verifier") {
-                            totalInstructionBeforeEnd += 1;
-                        }
-                        else if (currentToken->content == "cas" || currentToken->content == "cas ") {
-                            totalCasInVerifier += 1;
-                        }
-
-                        caseBloc_verifier.push_back(currentToken->content);
-                        ++currentToken;
-
-                        if (ExpectOperator(currentToken, ",").has_value()) {
-                            if (totalCasInVerifier > 0) {
-                                caseBloc_verifier.emplace_back(",");
-                                totalCasInVerifier -= 1;
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-
-                    if (var.getValue() == value_to_compare->content) {
-                        auto const TokenList = TokenBuilder::CodeToTokens(FPL::Utils::StringVectorToString(caseBloc_verifier));
-                        auto new_data = executeCode(TokenList, data, paquet);
-                        for (auto const& v : new_data.Variables) {
-                            if (v.second.isGlobal()) {
-                                data.pushVariable(v.second);
-                            }
-                        }
-                    }
-                } else {
-                    VERIFIER_CAS_title(currentToken);
-                }
-
-                if (ExpectOperator(currentToken, "}").has_value()) {
-                    if (totalInstructionBeforeEnd > 0) {
-                        totalInstructionBeforeEnd -= 1;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        else {
-            forgotToOpenCode(currentToken);
+        } else if (data.variableExist(var_name->content)) {
+            FPL::Instruction::Verifier::verifVariable(currentToken, data, var_name->content, fonction, paquet);
+        } else if (fonction.has_value() && fonction->isArgument(var_name->content)) {
+            FPL::Instruction::Verifier::verifArgument(currentToken, data, var_name->content, fonction, paquet);
         }
     }
 
-    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet) {
-        std::optional<Token> varName = ExpectIdentifiant(currentToken);
-        if (!varName.has_value()) {
+    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+        auto var_name = ExpectIdentifiant(currentToken);
+        if (!var_name.has_value()) {
             forgotvariable(currentToken);
         }
 
-        auto conditionalOperator = ExpecterConditionalOperator(currentToken);
-        if (!conditionalOperator.has_value()) {
+        auto condOperator = ExpecterConditionalOperator(currentToken);
+        if (!condOperator.has_value()) {
             forgotConditionalOperator(currentToken);
         }
 
-        std::optional<FPL::Definition::Values::Value> valueToCompare = ExpectValue(currentToken);
+        auto valueToCompare = ExpectValue(currentToken);
         if (!valueToCompare.has_value()) {
             forgotValue(currentToken);
         }
@@ -555,12 +502,12 @@ namespace FPL::Essential::Parser {
             TANTQUE_Vir_forgot(currentToken);
         }
 
-        std::optional<Token> action = ExpectIdentifiant(currentToken);
-        if (!action.has_value() || (action->content != "diminuer" && action->content != "augmenter")) {
+        auto action = ExpectIdentifiant(currentToken);
+        if (!action.has_value() || action->content != "diminuer" && action->content != "augmenter") {
             TANTQUE_wrong_action(currentToken);
         }
 
-        std::optional<FPL::Definition::Values::Value> valueToAddOrRemove = ExpectValue(currentToken);
+        auto valueToAddOrRemove = ExpectValue(currentToken);
         if (!valueToAddOrRemove.has_value()) {
             forgotValue(currentToken);
         }
@@ -587,84 +534,81 @@ namespace FPL::Essential::Parser {
             currentToken++;
         }
 
-        if (nestedBrackets != 0) {
-            std::cerr << "Erreur : les accolades ne sont pas correctement fermées" << std::endl;
+        auto var = data.getVariable(var_name->content);
+        if (!var.has_value()) {
+            forgotvariable(currentToken);
         }
 
-        std::vector<Variable> variablesToUpdate;
-        std::vector<std::string> variablesToUpdate_values;
+        auto var_Value = FPL::Utils::stringToDouble(var->getValue());
+        auto var_Compare = FPL::Utils::stringToDouble(valueToCompare->content);
+        auto _AddRemove = FPL::Utils::stringToDouble(valueToAddOrRemove->content);
 
-        if (varName.has_value()) {
-            std::optional<Variable> optionalVar = data.getVariable(varName->content);
-            if (optionalVar.has_value()) {
-                Variable var = optionalVar.value();
-                std::string currentValue = var.getValue();
-                std::string valueToCompareStr = valueToCompare->content;
-                bool conditionMet = false;
-
-                if (conditionalOperator.value() == ">") {
-                    conditionMet = (currentValue > valueToCompareStr);
-                } else if (conditionalOperator.value() == "<") {
-                    conditionMet = (currentValue < valueToCompareStr);
-                } else if (conditionalOperator.value() == ">=") {
-                    conditionMet = (currentValue >= valueToCompareStr);
-                } else if (conditionalOperator.value() == "<=") {
-                    conditionMet = (currentValue <= valueToCompareStr);
+        if (condOperator.value() == ">") {
+            while (var_Value > var_Compare) {
+                if (action->content == "augmenter") {
+                    var_Value.value() += _AddRemove.value();
+                } else {
+                    var_Value.value() -= _AddRemove.value();
                 }
-
-                while (conditionMet) {
-                    auto new_data = executeCode(innerCodeTokens, data, paquet);
-
-                    if (action->content == "diminuer") {
-                        auto value = std::stoi(valueToAddOrRemove->content);
-                        currentValue = std::to_string(std::stoi(currentValue) - value);
-                    } else if (action->content == "augmenter") {
-                        auto value = std::stoi(valueToAddOrRemove->content);
-                        currentValue = std::to_string(std::stoi(currentValue) + value);
+                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                for (auto &e : new_data.Variables) {
+                    if (data.variableExist(e.second)) {
+                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
                     }
-
-                    var.setValue(currentValue);
-                    data.updateVariableValue(var, currentValue);
-
-                    if (conditionalOperator.value() == ">") {
-                        conditionMet = (currentValue > valueToCompareStr);
-                    } else if (conditionalOperator.value() == "<") {
-                        conditionMet = (currentValue < valueToCompareStr);
-                    } else if (conditionalOperator.value() == ">=") {
-                        conditionMet = (currentValue >= valueToCompareStr);
-                    } else if (conditionalOperator.value() == "<=") {
-                        conditionMet = (currentValue <= valueToCompareStr);
-                    }
-
-                    for (const auto& pos_var : new_data.Variables) {
-                        const std::string& _variableName = pos_var.first;
-                        const Variable& newVar = pos_var.second;
-
-                        if (newVar.isGlobal() && !data.variableExist(_variableName)) {
-                            data.pushVariable(newVar);
-                        }
-
-                        auto newValue = newVar.getValue();
-                        auto variable = data.getVariable(_variableName);
-
-                        if (variable.has_value()) {
-                            variablesToUpdate.push_back(variable.value());
-                            variablesToUpdate_values.push_back(newValue);
-                        }
-                    }
-                }
-
-                int i = 0;
-                for (auto const& e : variablesToUpdate) {
-                    auto value = variablesToUpdate_values[i];
-                    data.updateVariableValue(e, value);
-                    i++;
                 }
             }
+        } else if (condOperator.value() == ">=") {
+            while (var_Value >= var_Compare) {
+                if (action->content == "augmenter") {
+                    var_Value.value() += _AddRemove.value();
+                } else {
+                    var_Value.value() -= _AddRemove.value();
+                }
+                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                for (auto &e : new_data.Variables) {
+                    if (data.variableExist(e.second)) {
+                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                    }
+                }
+            }
+        } else if (condOperator.value() == "<") {
+            while (var_Value < var_Compare) {
+                if (action->content == "augmenter") {
+                    var_Value.value() += _AddRemove.value();
+                } else {
+                    var_Value.value() -= _AddRemove.value();
+                }
+                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                for (auto &e : new_data.Variables) {
+                    if (data.variableExist(e.second)) {
+                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                    }
+                }
+            }
+        } else if (condOperator.value() == "<=") {
+            while (var_Value <= var_Compare) {
+                if (action->content == "augmenter") {
+                    var_Value.value() += _AddRemove.value();
+                } else {
+                    var_Value.value() -= _AddRemove.value();
+                }
+                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                for (auto &e : new_data.Variables) {
+                    if (data.variableExist(e.second)) {
+                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                    }
+                }
+            }
+        } else {
+            TANTQUE_wrong_conditionalOperator(currentToken);
         }
     }
 
-    void Parser::PAQUET_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token> tokenList, std::optional<std::string> paquet) {
+    void Parser::PAQUET_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
         auto paq_name = ExpectIdentifiant(currentToken);
         if (!paq_name.has_value()) {
             forgotName(currentToken);
@@ -698,12 +642,136 @@ namespace FPL::Essential::Parser {
             currentToken++;
         }
 
-        auto new_data = executeCode(innerCodeTokens, data, paquetName);
+        auto new_data = executeCode(innerCodeTokens, data, paquetName, fonction);
 
         for (auto const& variables : new_data.Variables) {
             if (!data.variableExist(variables.second.getName())) {
                 data.pushVariable(variables.second);
             }
+        }
+    }
+
+    void Parser::DEFINIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+        auto f_name = ExpectIdentifiant(currentToken);
+        if (!f_name.has_value()) {
+            forgotName(currentToken);
+        }
+
+        std::string funcName = f_name->content;
+        if (paquet.has_value()) {
+            funcName = paquet.value() + "." + f_name->content;
+        }
+
+        // Get Arguments:
+        if (ExpectOperator(currentToken, "(").has_value()) {
+            FPL::Definition::Fonctions::Fonction f;
+            f.setName(funcName);
+
+            while (!ExpectOperator(currentToken, ")").has_value()) {
+                auto arg_type = ExpectType(currentToken);
+                if (!arg_type.has_value()) {
+                    forgotType(currentToken);
+                }
+
+                auto arg_name = ExpectIdentifiant(currentToken);
+                if (!arg_name.has_value()) {
+                    forgotName(currentToken);
+                }
+
+                FPL::Definition::Fonctions::Argument arg;
+                arg.setName(arg_name->content);
+                arg.setType(arg_type.value());
+
+                f.addArgument(arg);
+
+                if (ExpectOperator(currentToken, ")").has_value()) {
+                    break;
+                } else if (!ExpectOperator(currentToken, ",").has_value()) {
+                    FUNC_needToAddParameter(currentToken);
+                }
+            }
+
+            if (!ExpectOperator(currentToken, "{").has_value()) {
+                forgotToOpenCode(currentToken);
+            }
+
+            std::vector<Token> innerCodeTokens;
+
+            int nestedBrackets = 1;
+
+            while (currentToken != tokenList.end() && nestedBrackets > 0) {
+                if (currentToken->content == "{") {
+                    nestedBrackets++;
+                } else if (currentToken->content == "}") {
+                    nestedBrackets--;
+                }
+
+                if (nestedBrackets > 0) {
+                    innerCodeTokens.push_back(*currentToken);
+                }
+
+                currentToken++;
+            }
+
+            f.setTokens(innerCodeTokens);
+
+            data.pushFonction(f);
+        } else {
+            forgotOpenParenthese(currentToken);
+        }
+    }
+
+    void Parser::APPELER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token>& tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+        auto f_name = ExpectIdentifiant(currentToken);
+        if (!f_name) {
+            forgotName(currentToken);
+        }
+
+        if (!data.isFonction(f_name->content)) {
+            FUNC_doesNotExist(currentToken);
+        }
+
+        auto f = data.getFonction(f_name->content).value();
+
+        if (f.getArgumentsSize() == 0) {
+            executeCode(f.getTokensFunction(), data, std::move(paquet), f);
+        } else {
+            if(!ExpectOperator(currentToken, "(").has_value()) {
+                forgotOpenParenthese(currentToken);
+            }
+
+            int totalWaitingArgs = f.getArgumentsSize();
+            while (totalWaitingArgs > 0) {
+                auto possibleArgName = ExpectIdentifiant(currentToken);
+                if (!possibleArgName || !data.isFonctionArgument(f.getName(), possibleArgName->content)) {
+                    FUNC_needArg(currentToken);
+                }
+
+                auto possibleValue = ExpectValue(currentToken);
+                if(!possibleValue.has_value()) {
+                    forgotValue(currentToken);
+                }
+
+                auto currentArg = data.getFonctionArgument(f.getName(), possibleArgName->content);
+
+                if (currentArg->getType() != possibleValue->type) {
+                    FUNC_wrongTypeArg(currentToken);
+                }
+
+                f.updateValueArgument(possibleArgName->content, possibleValue.value());
+
+                totalWaitingArgs--;
+
+                if (ExpectOperator(currentToken, ")").has_value() && totalWaitingArgs > 0) {
+                    FUNC_needArg(currentToken);
+                } else if (ExpectOperator(currentToken, ")").has_value() && totalWaitingArgs == 0) {
+                    break;
+                } else if (!ExpectOperator(currentToken, ")").has_value() && totalWaitingArgs > 0 && !ExpectOperator(currentToken, ",").has_value()) {
+                    FUNC_needToAddArgumentInCall(currentToken);
+                }
+            }
+
+            executeCode(f.getTokensFunction(), data, std::move(paquet), f);
         }
     }
 }
