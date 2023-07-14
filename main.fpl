@@ -1,3 +1,14 @@
-definir main() {
-    envoyer "yo"
+variable entier i -> 2
+variable entier a -> 10
+variable entier z -> 3
+
+tantque i > 0, diminuer 1 {
+    tantque a > 0, diminuer 5 {
+    }
+    tantque z > 0, diminuer 1 {
+    }
 }
+
+envoyer i
+envoyer a
+envoyer z
