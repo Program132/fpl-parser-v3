@@ -8,7 +8,7 @@ FPL::Definition::Values::Value FPL::Definition::Fonctions::Fonction::getReturnVa
     return this->returnValue;
 }
 
-std::map<std::string, FPL::Definition::Fonctions::Argument> FPL::Definition::Fonctions::Fonction::getArguments() {
+std::unordered_map<std::string, FPL::Definition::Fonctions::Argument> FPL::Definition::Fonctions::Fonction::getArguments() {
     return this->arguments;
 }
 
@@ -25,7 +25,7 @@ void FPL::Definition::Fonctions::Fonction::setReturnValue(FPL::Definition::Value
 }
 
 bool FPL::Definition::Fonctions::Fonction::isArgument(const std::string& a) {
-    if (this->getArguments().contains(a)) {
+    if (this->arguments.contains(a)) {
         return true;
     }
     return false;
@@ -33,13 +33,13 @@ bool FPL::Definition::Fonctions::Fonction::isArgument(const std::string& a) {
 
 std::optional<FPL::Definition::Fonctions::Argument> FPL::Definition::Fonctions::Fonction::getArgument(const std::string &a) {
     if (this->isArgument(a)) {
-        return this->getArguments()[a];
+        return this->arguments[a];
     }
     return std::nullopt;
 }
 
 void FPL::Definition::Fonctions::Fonction::addArgument(FPL::Definition::Fonctions::Argument arg) {
-    this->getArguments()[arg.getName()] = arg;
+    this->arguments[arg.getName()] = arg;
 }
 
 void FPL::Definition::Fonctions::Fonction::removeArgument(FPL::Definition::Fonctions::Argument keyToRemove) {
@@ -57,6 +57,16 @@ FPL::Definition::Fonctions::Fonction::Fonction(const std::string &n, const FPL::
 
 void FPL::Definition::Fonctions::Fonction::setTokens(std::vector<FPL::Essential::Tokenizer::Token> const& tokens) {
     this->tokensInFunction = tokens;
+}
+
+int FPL::Definition::Fonctions::Fonction::getArgumentsSize() {
+    return this->arguments.size();
+}
+
+void FPL::Definition::Fonctions::Fonction::updateValueArgument(const std::string &argName, Values::Value const &argValue) {
+    if (isArgument(argName)) {
+        this->arguments[argName].setValue(argValue);
+    }
 }
 
 FPL::Definition::Fonctions::Fonction::Fonction() = default;
@@ -90,5 +100,11 @@ FPL::Definition::Fonctions::Argument::Argument(std::string const& n, FPL::Defini
     this->setType(t);
     this->setValue(v);
 }
+
+std::ostream& FPL::Definition::Fonctions::operator<<(std::ostream& flux, const FPL::Definition::Fonctions::Argument& argument) {
+    flux << "(ARG: " << argument.name << ", " << argument.value.content << ", " << Types::Types_STR[argument.type] << ")";
+    return flux;
+}
+
 
 FPL::Definition::Fonctions::Argument::Argument() = default;
