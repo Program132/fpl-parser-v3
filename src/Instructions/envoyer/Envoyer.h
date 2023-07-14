@@ -9,7 +9,11 @@
 
 #include "../../Essentials/ErrorsManager/ErrorsManager.h"
 
+#include "../../Essentials/Definitions/Fonctions/Fonctions.h"
+
+using namespace FPL::Definition;
+
 namespace FPL::Instruction::Envoyer {
-    void getInformation(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data, bool &pass);
-    void getInformation(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data);
+    void getInformation(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data, bool &pass, std::optional<Fonctions::Fonction> fonction);
+    void getInformation(std::vector<FPL::Essential::Tokenizer::Token>::iterator &currentToken, FPL::Essential::Data::Data &data, std::optional<Fonctions::Fonction> fonction);
 }
