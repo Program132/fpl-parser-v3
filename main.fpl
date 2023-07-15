@@ -1,14 +1,13 @@
-variable entier i -> 2
-variable entier a -> 10
-variable entier z -> 3
-
-tantque i > 0, diminuer 1 {
-    tantque a > 0, diminuer 5 {
-    }
-    tantque z > 0, diminuer 1 {
+definir main(entier i, entier a, entier z) {
+    tantque i > 0, diminuer 1 {
+        envoyer ["i: " i ]
+        tantque a > 0, diminuer 5 {
+        envoyer ["a: " a ]
+        }
+        tantque z > 0, diminuer 1 {
+        envoyer ["z: " z ]
+        }
     }
 }
 
-envoyer i
-envoyer a
-envoyer z
+appeler main(i 2, a 10, z 3)
