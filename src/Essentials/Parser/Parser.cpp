@@ -18,7 +18,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    Data::Data Parser::executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    Data::Data Parser::executeCode(std::vector<Token> tokenList, std::optional<Data::Data> old_data, const std::optional<std::string>& paquet, std::optional<Fonctions::Fonction> fonction) {
         Data::Data data;
 
         if (old_data.has_value()) {
@@ -40,7 +40,7 @@ namespace FPL::Essential::Parser {
         return data;
     }
 
-    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    bool Parser::managerInstructions(std::vector<Token>::iterator& currentToken, Data::Data &data, std::vector<Token> tokenList, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto instruction = ExpectIdentifiant(currentToken);
         if (instruction.has_value()) {
             if (instruction->content == "envoyer") {
@@ -93,7 +93,7 @@ namespace FPL::Essential::Parser {
         return false;
     }
 
-    void Parser::ENVOYER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::ENVOYER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         bool pass = false;
 
         FPL::Instruction::Envoyer::getInformation(currentToken, data, pass, fonction);
@@ -116,7 +116,7 @@ namespace FPL::Essential::Parser {
         std::cout << std::endl;
     }
 
-    void Parser::VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::VARIABLE_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, const std::optional<Fonctions::Fonction>& fonction) {
         if (paquet.has_value()) {
             Variable var = FPL::Instruction::VariablesUtils::defineVariable_Paquet(currentToken, data, paquet.value(), fonction);
 
@@ -136,7 +136,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::CHANGER_Instruction( std::vector<Token>::iterator& currentToken, Data::Data& data, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name.has_value()) {
             CHANGER_Instruction_unknowVariable(currentToken);
@@ -223,7 +223,7 @@ namespace FPL::Essential::Parser {
         data.pushVariable(var);
     }
 
-    void Parser::FICHIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::FICHIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto instru = ExpectIdentifiant(currentToken);
         if (!instru.has_value()) {
             missingparameter(currentToken);
@@ -279,7 +279,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::CONSTANTE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::CONSTANTE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto possibleGlobal = ExpectIdentifiant(currentToken);
         bool global = false;
         if (possibleGlobal.has_value() && possibleGlobal->content == "globale") {
@@ -322,7 +322,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::GLOBALE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::GLOBALE_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto possibleConst = ExpectIdentifiant(currentToken);
         bool cons = false;
         if (possibleConst.has_value() && possibleConst->content == "constante") {
@@ -365,7 +365,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::RETIRER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::RETIRER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
 
         if (!var_name.has_value()) {
@@ -380,7 +380,7 @@ namespace FPL::Essential::Parser {
         data.deleteVariableFromMap(var);
     }
 
-    void Parser::IMPORTER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::IMPORTER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, const std::optional<std::string>& paquet, std::optional<Fonctions::Fonction> fonction) {
         auto path = ExpectValue(currentToken);
 
         if (!path.has_value() || path->type != Definition::Types::STRING) {
@@ -394,7 +394,7 @@ namespace FPL::Essential::Parser {
 
         std::string contentFile((std::istreambuf_iterator<char>(fichier_fpl)), (std::istreambuf_iterator<char>()));
         auto const TokenList = TokenBuilder::CodeToTokens(contentFile);
-        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList, std::nullopt, paquet, fonction);
+        auto next_data = FPL::Essential::Parser::Parser::executeCode(TokenList, std::nullopt, paquet, std::move(fonction));
 
         for (auto const& var : next_data.Variables) {
             if (var.second.isGlobal()) {
@@ -403,7 +403,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::CONVERTIR_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::CONVERTIR_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name.has_value()) {
             forgotvariable(currentToken);
@@ -467,7 +467,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::VERIFIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::VERIFIER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, const std::optional<std::string>& paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name) {
             forgotvariable(currentToken);
@@ -482,7 +482,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::TANT_QUE_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, const std::optional<std::string>& paquet, std::optional<Fonctions::Fonction> fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name.has_value()) {
             forgotvariable(currentToken);
@@ -534,77 +534,329 @@ namespace FPL::Essential::Parser {
             currentToken++;
         }
 
-        auto var = data.getVariable(var_name->content);
-        if (!var.has_value()) {
-            forgotvariable(currentToken);
+        if (valueToCompare->type == Definition::Types::STRING || valueToCompare->type == Definition::Types::BOOL) {
+            TANTQUE_valueWrongType(currentToken);
+        }
+        if (valueToAddOrRemove->type == Definition::Types::STRING || valueToAddOrRemove->type == Definition::Types::BOOL) {
+            TANTQUE_valueWrongType(currentToken);
         }
 
-        auto var_Value = FPL::Utils::stringToDouble(var->getValue());
-        auto var_Compare = FPL::Utils::stringToDouble(valueToCompare->content);
-        auto _AddRemove = FPL::Utils::stringToDouble(valueToAddOrRemove->content);
+        auto var = data.getVariable(var_name->content);
+        if (var.has_value()) {
+            if (var->getType() == Definition::Types::STRING || var->getType() == Definition::Types::BOOL) {
+                TANTQUE_varWrongType(currentToken);
+            }
 
-        if (condOperator.value() == ">") {
-            while (var_Value > var_Compare) {
-                if (action->content == "augmenter") {
-                    var_Value.value() += _AddRemove.value();
-                } else {
-                    var_Value.value() -= _AddRemove.value();
-                }
-                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
-                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                for (auto &e : new_data.Variables) {
-                    if (data.variableExist(e.second)) {
-                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+            if (var->getType() == Definition::Types::DOUBLE) {
+                auto var_Value = FPL::Utils::stringToDouble(var->getValue());
+                auto var_Compare = FPL::Utils::stringToDouble(valueToCompare->content);
+                auto AddRemove = FPL::Utils::stringToDouble(valueToAddOrRemove->content);
+
+                if (condOperator.value() == ">") {
+                    while (var_Value > var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
                     }
+                } else if (condOperator.value() == ">=") {
+                    while (var_Value >= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<") {
+                    while (var_Value < var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<=") {
+                    while (var_Value <= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else {
+                    TANTQUE_wrong_conditionalOperator(currentToken);
+                }
+            } else if (var->getType() == Definition::Types::INT) {
+                auto var_Value = FPL::Utils::stringToInt(var->getValue());
+                auto var_Compare = FPL::Utils::stringToInt(valueToCompare->content);
+                auto AddRemove = FPL::Utils::stringToInt(valueToAddOrRemove->content);
+
+                if (condOperator.value() == ">") {
+                    while (var_Value > var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == ">=") {
+                    while (var_Value >= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<") {
+                    while (var_Value < var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<=") {
+                    while (var_Value <= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else {
+                    TANTQUE_wrong_conditionalOperator(currentToken);
                 }
             }
-        } else if (condOperator.value() == ">=") {
-            while (var_Value >= var_Compare) {
-                if (action->content == "augmenter") {
-                    var_Value.value() += _AddRemove.value();
-                } else {
-                    var_Value.value() -= _AddRemove.value();
-                }
-                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
-                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                for (auto &e : new_data.Variables) {
-                    if (data.variableExist(e.second)) {
-                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+        }
+        else if (fonction.has_value() && fonction->isArgument(var_name->content)) {
+            auto arg = fonction->getArgument(var_name->content);
+
+            if (arg->getType() == Definition::Types::STRING || arg->getType() == Definition::Types::BOOL) {
+                TANTQUE_varWrongType(currentToken);
+            }
+
+            if (arg->getType() == Definition::Types::DOUBLE) {
+                auto var_Value = FPL::Utils::stringToDouble(arg->getValue().content);
+                auto var_Compare = FPL::Utils::stringToDouble(valueToCompare->content);
+                auto AddRemove = FPL::Utils::stringToDouble(valueToAddOrRemove->content);
+
+                if (condOperator.value() == ">") {
+                    while (var_Value > var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
                     }
+                } else if (condOperator.value() == ">=") {
+                    while (var_Value >= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<") {
+                    while (var_Value < var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<=") {
+                    while (var_Value <= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else {
+                    TANTQUE_wrong_conditionalOperator(currentToken);
                 }
             }
-        } else if (condOperator.value() == "<") {
-            while (var_Value < var_Compare) {
-                if (action->content == "augmenter") {
-                    var_Value.value() += _AddRemove.value();
-                } else {
-                    var_Value.value() -= _AddRemove.value();
-                }
-                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
-                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                for (auto &e : new_data.Variables) {
-                    if (data.variableExist(e.second)) {
-                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+            else if (var->getType() == Definition::Types::INT) {
+                auto var_Value = FPL::Utils::stringToInt(arg->getValue().content);
+                auto var_Compare = FPL::Utils::stringToInt(valueToCompare->content);
+                auto AddRemove = FPL::Utils::stringToInt(valueToAddOrRemove->content);
+
+                if (condOperator.value() == ">") {
+                    while (var_Value > var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
                     }
+                } else if (condOperator.value() == ">=") {
+                    while (var_Value >= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<") {
+                    while (var_Value < var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else if (condOperator.value() == "<=") {
+                    while (var_Value <= var_Compare) {
+                        if (action->content == "augmenter") {
+                            var_Value.value() += AddRemove.value();
+                        } else {
+                            var_Value.value() -= AddRemove.value();
+                        }
+                        Values::Value new_Arg_value;
+                        new_Arg_value.type = arg->getType();
+                        new_Arg_value.content = std::to_string(var_Value.value());
+                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
+                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
+                        for (auto &e : new_data.Variables) {
+                            if (data.variableExist(e.second)) {
+                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
+                            }
+                        }
+                    }
+                } else {
+                    TANTQUE_wrong_conditionalOperator(currentToken);
                 }
             }
-        } else if (condOperator.value() == "<=") {
-            while (var_Value <= var_Compare) {
-                if (action->content == "augmenter") {
-                    var_Value.value() += _AddRemove.value();
-                } else {
-                    var_Value.value() -= _AddRemove.value();
-                }
-                data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
-                auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                for (auto &e : new_data.Variables) {
-                    if (data.variableExist(e.second)) {
-                        data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                    }
-                }
-            }
-        } else {
-            TANTQUE_wrong_conditionalOperator(currentToken);
+        }
+        else {
+            forgotvariable(currentToken);
         }
     }
 
@@ -642,7 +894,7 @@ namespace FPL::Essential::Parser {
             currentToken++;
         }
 
-        auto new_data = executeCode(innerCodeTokens, data, paquetName, fonction);
+        auto new_data = executeCode(innerCodeTokens, data, paquetName, std::move(fonction));
 
         for (auto const& variables : new_data.Variables) {
             if (!data.variableExist(variables.second.getName())) {
@@ -651,7 +903,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::DEFINIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::DEFINIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto f_name = ExpectIdentifiant(currentToken);
         if (!f_name.has_value()) {
             forgotName(currentToken);
@@ -721,7 +973,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::APPELER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token>& tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction) {
+    void Parser::APPELER_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token>& tokenList, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction) {
         auto f_name = ExpectIdentifiant(currentToken);
         if (!f_name) {
             forgotName(currentToken);
@@ -734,7 +986,7 @@ namespace FPL::Essential::Parser {
         auto f = data.getFonction(f_name->content).value();
 
         if (f.getArgumentsSize() == 0) {
-            executeCode(f.getTokensFunction(), data, std::move(paquet), f);
+            executeCode(f.getTokensFunction(), data, paquet, f);
         } else {
             if(!ExpectOperator(currentToken, "(").has_value()) {
                 forgotOpenParenthese(currentToken);
@@ -771,7 +1023,7 @@ namespace FPL::Essential::Parser {
                 }
             }
 
-            executeCode(f.getTokensFunction(), data, std::move(paquet), f);
+            executeCode(f.getTokensFunction(), data, paquet, f);
         }
     }
 }
