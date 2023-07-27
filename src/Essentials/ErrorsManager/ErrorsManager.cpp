@@ -36,3 +36,4 @@ CREATE_ERROR(FUNC_wrongTypeArg, "Type non cohérent avec un argument, ligne ", 2
 CREATE_ERROR(FUNC_needToAddArgumentInCall, "Vous devez ajouter ',' pour continuer a donner des les arguments -> '[name] [value], ...', ligne ", 30)
 CREATE_ERROR(TANTQUE_varWrongType, "La variable doit etre de type entier ou decimal, ligne ", 31)
 CREATE_ERROR(TANTQUE_valueWrongType, "La/Les valeur(s) precise doit/doivent etre de type entier ou decimal, ligne ", 32)
+CREATE_ERROR(forgotOpenBloc, "Vous devez utiliser '[' pour ouvrir un nouveau bloc et le fermer avec ']', ligne ", 33)
