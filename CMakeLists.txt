@@ -34,4 +34,12 @@ add_executable(fpl_parser_v3
         src/Essentials/Definitions/Fonctions/Fonctions.h
         src/Instructions/Conditions/verifier.cpp
         src/Instructions/Conditions/verifier.h
+        src/Utils/MathUtils/Converts.h
+        src/Utils/MathUtils/Converts.cpp
+        src/Utils/MathUtils/MathParser/Utils/Converts.h
+        src/Utils/MathUtils/MathParser/Utils/Converts.cpp
+        src/Utils/MathUtils/MathParser/MathParser.h
+        src/Utils/MathUtils/MathParser/MathParser.cpp
+        src/Utils/MathUtils/MathParser/MathTokenizer.h
+        src/Utils/MathUtils/MathParser/MathTokenizer.cpp
         )
