@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Expecter.h"
 
 std::optional<Token> ExpectIdentifiant(std::vector<Token>::iterator &current) {
