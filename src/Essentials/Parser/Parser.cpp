@@ -1,6 +1,3 @@
-#include <fstream>
-#include <unordered_map>
-#include <utility>
 #include "Parser.h"
 
 namespace FPL::Essential::Parser {
@@ -87,6 +84,9 @@ namespace FPL::Essential::Parser {
                 return true;
             } else if (instruction->content == "appeler") {
                 APPELER_Instruction(currentToken, data, tokenList, paquet, fonction);
+                return true;
+            } else if (instruction->content == "math") {
+                MATH_Instruction(currentToken, data, tokenList, paquet, fonction);
                 return true;
             }
         }
@@ -875,5 +875,31 @@ namespace FPL::Essential::Parser {
                 }
             }
         }
+    }
+
+    void Parser::MATH_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data,
+                                  std::vector<Token> &tokenList, const std::optional<std::string> &paquet,
+                                  const std::optional<Fonctions::Fonction> &fonction) {
+        auto var_name = ExpectIdentifiant(currentToken);
+        if (!var_name) {
+            forgotName(currentToken);
+        }
+
+        if (!ExpectOperator(currentToken, "[").has_value()) {
+            forgotOpenBloc(currentToken);
+        }
+
+        std::vector<std::string> innerCodeTokens;
+
+        while (currentToken != tokenList.end() && !ExpectOperator(currentToken, "]").has_value()) {
+            innerCodeTokens.push_back(currentToken->content);
+            currentToken++;
+        }
+        std::string MathInsContent = FPL::Utils::StringVectorToString(innerCodeTokens);
+        std::vector<MathParser::Token> contentMathTokens = MathParser::TokenBuilding::ParserTokens(MathInsContent);
+        double result = MATHPARSER_Parser(contentMathTokens);
+
+        Variable var(var_name->content, std::to_string(result), Definition::Types::DOUBLE);
+        data.pushVariable(var);
     }
 }

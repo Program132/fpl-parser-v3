@@ -8,6 +8,8 @@
 #include <iterator>
 #include <optional>
 #include <map>
+#include <unordered_map>
+#include <utility>
 
 #include "../Tokenizer/Tokenizer.h"
 #include "../Data/Data.h"
@@ -25,6 +27,9 @@
 
 #include "../../Utils/stringTo.h"
 #include "../../Utils/VectorsTo.h"
+
+#include "../../Utils/MathUtils/MathParser/MathTokenizer.h"
+#include "../../Utils/MathUtils/MathParser/MathParser.h"
 
 using namespace FPL::Definition;
 using namespace FPL::Essential::Tokenizer;
@@ -53,5 +58,6 @@ namespace FPL::Essential::Parser {
         static void PAQUET_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, std::optional<Fonctions::Fonction> fonction);
         static void DEFINIR_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token> tokenList, std::optional<std::string> paquet, const std::optional<Fonctions::Fonction>& fonction);
         static void APPELER_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token>& tokenList, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction);
+        static void MATH_Instruction(std::vector<Token>::iterator& currentToken, Data::Data& data, std::vector<Token>& tokenList, const std::optional<std::string>& paquet, const std::optional<Fonctions::Fonction>& fonction);
     };
 }
