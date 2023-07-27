@@ -11,9 +11,6 @@ namespace FPL::Instruction::Envoyer {
             if (identifiant.has_value() && data.variableExist(identifiant->content)) {
                 std::cout << data.getVariable(identifiant->content)->getValue();
                 pass = true;
-            } else if (fonction.has_value() && fonction->isArgument(identifiant->content)) {
-                std::cout << fonction->getArgument(identifiant->content)->getValue().content;
-                pass = true;
             }
         }
     }
@@ -26,8 +23,6 @@ namespace FPL::Instruction::Envoyer {
             auto identifiant = ExpectIdentifiant(currentToken);
             if (identifiant.has_value() && data.variableExist(identifiant->content)) {
                 std::cout << data.getVariable(identifiant->content)->getValue();
-            } else if (fonction.has_value() && fonction->isArgument(identifiant->content)) {
-                std::cout << fonction->getArgument(identifiant->content)->getValue().content;
             }
         }
     }
