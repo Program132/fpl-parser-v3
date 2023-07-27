@@ -14,11 +14,6 @@
 
 namespace FPL::Definition::Fonctions {
     class Argument {
-    private:
-        std::string name;
-        Types::Type type;
-        Values::Value value;
-
     public:
         Argument();
         Argument(std::string const& n, Types::Type const& t, Values::Value const& v);
@@ -32,6 +27,10 @@ namespace FPL::Definition::Fonctions {
         void setValue(Values::Value const& v);
 
         friend std::ostream& operator<<(std::ostream& flux, const FPL::Definition::Fonctions::Argument& argument);
+
+        Types::Type type;
+        std::string name;
+        Values::Value value;
     };
 
     class Fonction {
