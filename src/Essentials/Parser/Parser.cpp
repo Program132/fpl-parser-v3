@@ -877,9 +877,7 @@ namespace FPL::Essential::Parser {
         }
     }
 
-    void Parser::MATH_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data,
-                                  std::vector<Token> &tokenList, const std::optional<std::string> &paquet,
-                                  const std::optional<Fonctions::Fonction> &fonction) {
+    void Parser::MATH_Instruction(std::vector<Token>::iterator &currentToken, Data::Data &data, std::vector<Token> &tokenList, const std::optional<std::string> &paquet, const std::optional<Fonctions::Fonction> &fonction) {
         auto var_name = ExpectIdentifiant(currentToken);
         if (!var_name) {
             forgotName(currentToken);
