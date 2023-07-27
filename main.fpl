@@ -1,12 +1,19 @@
 definir main(entier i, entier a, entier z) {
     tantque i > 0, diminuer 1 {
-        envoyer ["i: " i ]
-        tantque a > 0, diminuer 5 {
-        envoyer ["a: " a ]
+        tantque a > 0, diminuer 1 {
         }
         tantque z > 0, diminuer 1 {
-        envoyer ["z: " z ]
         }
+    }
+
+    envoyer i
+    envoyer a
+    envoyer z
+
+    verifier i {
+        cas 1:
+            envoyer "Mission Accompli !"
+            ,
     }
 }
 
