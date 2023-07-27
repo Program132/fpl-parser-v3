@@ -553,7 +553,7 @@ namespace FPL::Essential::Parser {
                 auto AddRemove = FPL::Utils::stringToDouble(valueToAddOrRemove->content);
 
                 if (condOperator.value() == ">") {
-                    while (var_Value > var_Compare) {
+                    while (var_Value.value() > var_Compare.value() + 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -568,7 +568,7 @@ namespace FPL::Essential::Parser {
                         }
                     }
                 } else if (condOperator.value() == ">=") {
-                    while (var_Value >= var_Compare) {
+                    while (var_Value.value() >= var_Compare.value() + 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -583,7 +583,7 @@ namespace FPL::Essential::Parser {
                         }
                     }
                 } else if (condOperator.value() == "<") {
-                    while (var_Value < var_Compare) {
+                    while (var_Value.value() < var_Compare.value() - 1 ) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -598,7 +598,7 @@ namespace FPL::Essential::Parser {
                         }
                     }
                 } else if (condOperator.value() == "<=") {
-                    while (var_Value <= var_Compare) {
+                    while (var_Value.value() <= var_Compare.value() - 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -621,7 +621,7 @@ namespace FPL::Essential::Parser {
                 auto AddRemove = FPL::Utils::stringToInt(valueToAddOrRemove->content);
 
                 if (condOperator.value() == ">") {
-                    while (var_Value > var_Compare) {
+                    while (var_Value.value() > var_Compare.value() + 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -636,7 +636,7 @@ namespace FPL::Essential::Parser {
                         }
                     }
                 } else if (condOperator.value() == ">=") {
-                    while (var_Value >= var_Compare) {
+                    while (var_Value.value() >= var_Compare.value() + 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -651,7 +651,7 @@ namespace FPL::Essential::Parser {
                         }
                     }
                 } else if (condOperator.value() == "<") {
-                    while (var_Value < var_Compare) {
+                    while (var_Value.value() < var_Compare.value() - 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
@@ -666,183 +666,13 @@ namespace FPL::Essential::Parser {
                         }
                     }
                 } else if (condOperator.value() == "<=") {
-                    while (var_Value <= var_Compare) {
+                    while (var_Value.value() <= var_Compare.value() - 1) {
                         if (action->content == "augmenter") {
                             var_Value.value() += AddRemove.value();
                         } else {
                             var_Value.value() -= AddRemove.value();
                         }
                         data.updateVariableValue(var.value(), std::to_string(var_Value.value()));
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else {
-                    TANTQUE_wrong_conditionalOperator(currentToken);
-                }
-            }
-        }
-        else if (fonction.has_value() && fonction->isArgument(var_name->content)) {
-            auto arg = fonction->getArgument(var_name->content);
-
-            if (arg->getType() == Definition::Types::STRING || arg->getType() == Definition::Types::BOOL) {
-                TANTQUE_varWrongType(currentToken);
-            }
-
-            if (arg->getType() == Definition::Types::DOUBLE) {
-                auto var_Value = FPL::Utils::stringToDouble(arg->getValue().content);
-                auto var_Compare = FPL::Utils::stringToDouble(valueToCompare->content);
-                auto AddRemove = FPL::Utils::stringToDouble(valueToAddOrRemove->content);
-
-                if (condOperator.value() == ">") {
-                    while (var_Value > var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else if (condOperator.value() == ">=") {
-                    while (var_Value >= var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else if (condOperator.value() == "<") {
-                    while (var_Value < var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else if (condOperator.value() == "<=") {
-                    while (var_Value <= var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else {
-                    TANTQUE_wrong_conditionalOperator(currentToken);
-                }
-            }
-            else if (var->getType() == Definition::Types::INT) {
-                auto var_Value = FPL::Utils::stringToInt(arg->getValue().content);
-                auto var_Compare = FPL::Utils::stringToInt(valueToCompare->content);
-                auto AddRemove = FPL::Utils::stringToInt(valueToAddOrRemove->content);
-
-                if (condOperator.value() == ">") {
-                    while (var_Value > var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else if (condOperator.value() == ">=") {
-                    while (var_Value >= var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else if (condOperator.value() == "<") {
-                    while (var_Value < var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
-                        auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
-                        for (auto &e : new_data.Variables) {
-                            if (data.variableExist(e.second)) {
-                                data.updateVariableValue(data.getVariable(e.second.getName()).value(), e.second.getValue());
-                            }
-                        }
-                    }
-                } else if (condOperator.value() == "<=") {
-                    while (var_Value <= var_Compare) {
-                        if (action->content == "augmenter") {
-                            var_Value.value() += AddRemove.value();
-                        } else {
-                            var_Value.value() -= AddRemove.value();
-                        }
-                        Values::Value new_Arg_value;
-                        new_Arg_value.type = arg->getType();
-                        new_Arg_value.content = std::to_string(var_Value.value());
-                        fonction->updateValueArgument(arg->getName(), new_Arg_value);
                         auto new_data = executeCode(innerCodeTokens, data, paquet, fonction);
                         for (auto &e : new_data.Variables) {
                             if (data.variableExist(e.second)) {
@@ -986,7 +816,13 @@ namespace FPL::Essential::Parser {
         auto f = data.getFonction(f_name->content).value();
 
         if (f.getArgumentsSize() == 0) {
-            executeCode(f.getTokensFunction(), data, paquet, f);
+            auto next_data = executeCode(f.getTokensFunction(), data, paquet, f);
+
+            for (auto const& v : next_data.Variables) {
+                if (v.second.isGlobal()) {
+                    data.pushVariable(v.second);
+                }
+            }
         } else {
             if(!ExpectOperator(currentToken, "(").has_value()) {
                 forgotOpenParenthese(currentToken);
@@ -1010,10 +846,15 @@ namespace FPL::Essential::Parser {
                     FUNC_wrongTypeArg(currentToken);
                 }
 
-                f.updateValueArgument(possibleArgName->content, possibleValue.value());
+                Variable nextVar;
+                nextVar.setName(possibleArgName->content);
+                nextVar.setGlobal(false);
+                nextVar.setIsArgument(true);
+                nextVar.setType(f.getArgument(possibleArgName->content)->getType());
+                nextVar.setValue(possibleValue.value().content);
+                data.pushVariable(nextVar);
 
                 totalWaitingArgs--;
-
                 if (ExpectOperator(currentToken, ")").has_value() && totalWaitingArgs > 0) {
                     FUNC_needArg(currentToken);
                 } else if (ExpectOperator(currentToken, ")").has_value() && totalWaitingArgs == 0) {
@@ -1023,7 +864,16 @@ namespace FPL::Essential::Parser {
                 }
             }
 
-            executeCode(f.getTokensFunction(), data, paquet, f);
+            auto next_data = executeCode(f.getTokensFunction(), data, paquet, f);
+
+            for (auto const& v : next_data.Variables) {
+                if (v.second.isArgument()) {
+                    next_data.deleteVariableFromMap(v.second);
+                    data.deleteVariableFromMap(v.second);
+                } else if (v.second.isGlobal()) {
+                    data.pushVariable(v.second);
+                }
+            }
         }
     }
 }
