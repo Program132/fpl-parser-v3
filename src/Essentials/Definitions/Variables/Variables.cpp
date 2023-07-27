@@ -6,10 +6,9 @@ namespace FPL::Definition::Variables {
         return flux;
     }
 
+    Variable::Variable() = default;
 
-    Variable::Variable() =default;
-
-    Variable::Variable(std::string n, std::string v, Type t) {
+    Variable::Variable(const std::string& n, const std::string& v, Type t) {
         this->setName(n);
         this->setValue(v);
         this->setType(t);
@@ -53,6 +52,14 @@ namespace FPL::Definition::Variables {
 
     bool Variable::isMutable() const {
         return this->mut;
+    }
+
+    bool Variable::isArgument() const {
+        return this->isargument;
+    }
+
+    void Variable::setIsArgument(bool a) {
+        this->isargument = a;
     }
 }
 
