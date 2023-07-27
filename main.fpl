@@ -1,20 +1,2 @@
-definir main(entier i, entier a, entier z) {
-    tantque i > 0, diminuer 1 {
-        tantque a > 0, diminuer 1 {
-        }
-        tantque z > 0, diminuer 1 {
-        }
-    }
-
-    envoyer i
-    envoyer a
-    envoyer z
-
-    verifier i {
-        cas 1:
-            envoyer "Mission Accompli !"
-            ,
-    }
-}
-
-appeler main(i 2, a 10, z 3)
+math a [ 10 + 5 - 2 ]
+envoyer a
